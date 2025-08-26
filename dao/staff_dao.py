@@ -9,16 +9,17 @@ class StaffDao:
     
     def add_staff(self, staff_id, staff_name, role_id, age, phone_number, email, doj, password):
         db = DBConnection()
-        conn = db.get_connection()
+        self.conn = db.get_connection()
         cursor = None
         try:
-            cursor = conn.cursor()
+            self.conn.ping(reconnect=True)
+            cursor = self.conn.cursor()
             sql = """INSERT INTO staff 
                      (staff_id, staff_name, role_id, age, phone_number, email, date_of_joining, password_hash) 
                      VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"""
             password_hash = hashlib.sha256(password.encode()).hexdigest()
             cursor.execute(sql, (staff_id, staff_name, role_id, age, phone_number, email, doj, password_hash))
-            conn.commit()
+            self.conn.commit()
             print("✅ Staff added successfully!")
         except Exception as e:
             print(f"❌ Error while adding staff: {e}")
@@ -31,6 +32,7 @@ class StaffDao:
         conn = db.get_connection()
         cursor = None
         try:
+            self.conn.ping(reconnect=True)
             cursor = conn.cursor()
             sql = "UPDATE staff SET phone_number=%s, email=%s WHERE staff_id=%s"
             cursor.execute(sql, (phone_number, email, staff_id))
@@ -47,6 +49,7 @@ class StaffDao:
         conn = db.get_connection()
         cursor = None
         try:
+            self.conn.ping(reconnect=True)
             cursor = conn.cursor()
             sql = "UPDATE staff SET is_active=FALSE WHERE staff_id=%s"
             cursor.execute(sql, (staff_id,))
@@ -63,6 +66,7 @@ class StaffDao:
         conn = db.get_connection()
         cursor = None
         try:
+            self.conn.ping(reconnect=True)
             cursor = conn.cursor(pymysql.cursors.DictCursor)  
             sql = "SELECT * FROM staff"
             cursor.execute(sql)
@@ -76,10 +80,11 @@ class StaffDao:
                 cursor.close()
 
     def get_next_staff_id(self):
-        conn = DBConnection().get_connection()
+        self.conn = DBConnection().get_connection()
         cursor = None
         try:
-            cursor = conn.cursor()
+            self.conn.ping(reconnect=True)
+            cursor = self.conn.cursor()
             cursor.execute("SELECT staff_id FROM staff ORDER BY staff_id DESC LIMIT 1")
             result = cursor.fetchone()
             if result:

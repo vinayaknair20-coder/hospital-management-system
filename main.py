@@ -6,6 +6,7 @@ Team: Hospital Management System Development Team
 
 from db.db_connection import DBConnection
 from lib.Pharmacistservices import MedicineManagementLib
+from menu.admin_menu import AdminMenu
 
 # from lib.PatientManagementLib import ReceptionistServices  
 # from lib.menudriven import DoctorServices
@@ -28,29 +29,29 @@ def test_database_connection():
 
 def admin_menu():
     """Admin Dashboard - System Administration"""
-    print("\n Welcome to Admin Dashboard")
-    while True:
-        print("\n========== ADMIN MENU ==========")
-        print("1. USER MANAGEMENT")
-        print("2. SYSTEM REPORTS")
-        print("3. DATABASE BACKUP")
-        print("4. SYSTEM SETTINGS")
-        print("5. GO TO MAIN MENU")
+    # print("\n Welcome to Admin Dashboard")
+    # while True:
+    #     print("\n========== ADMIN MENU ==========")
+    #     print("1. USER MANAGEMENT")
+    #     print("2. SYSTEM REPORTS")
+    #     print("3. DATABASE BACKUP")
+    #     print("4. SYSTEM SETTINGS")
+    #     print("5. GO TO MAIN MENU")
         
-        choice = input("Enter your choice: ").strip()
+    #     choice = input("Enter your choice: ").strip()
         
-        if choice == "1":
-            print(" User Management - Coming Soon...")
-        elif choice == "2":
-            print(" System Reports - Coming Soon...")
-        elif choice == "3":
-            print(" Database Backup - Coming Soon...")
-        elif choice == "4":
-            print(" System Settings - Coming Soon...")
-        elif choice == "5":
-            break
-        else:
-            print(" Invalid choice! Please enter 1-5.")
+    #     if choice == "1":
+    #         AdminMenu().show_menu()
+    #     elif choice == "2":
+    #         print(" System Reports - Coming Soon...")
+    #     elif choice == "3":
+    #         print(" Database Backup - Coming Soon...")
+    #     elif choice == "4":
+    #         print(" System Settings - Coming Soon...")
+    #     elif choice == "5":
+    #         break
+    #     else:
+    #         print(" Invalid choice! Please enter 1-5.")
 
 
 def receptionist_menu():
@@ -243,7 +244,7 @@ def main():
             choice = input("Enter your choice (1-6): ").strip()
 
             if choice == "1":
-                admin_menu()
+                AdminMenu().show_menu()
             elif choice == "2":
                 receptionist_menu()
             elif choice == "3":
