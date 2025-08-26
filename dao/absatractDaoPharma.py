@@ -4,11 +4,11 @@ from models.medicine import Medicine
 
 class medecineDaoService(ABC):
     @abstractmethod
-    def display_all_medecine(self)->List[Medicine]:
+    def display_all_medicine(self)->List[Medicine]:
         '''display all medicine'''
         pass
 
     @abstractmethod
-    def add_medice(self)->bool:
+    def add_medicine(self)->bool:
         '''insert medecine '''
         pass
