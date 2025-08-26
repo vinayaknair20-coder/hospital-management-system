@@ -7,8 +7,8 @@ from pymysql.cursors import DictCursor
 class medicineDaoImp(medecineDaoService):
     '''implementation of abstract class methods'''
     #sql queries
-    DISPLAY_ALL_MEDICINE ="SELECT*FROM medicine_inventory"
-    INSERT_MEDICINE = "INSERT INTO medicine_inventory (medicine_id,medicine_name,generic_name,manufacturer,batch_number,quantity_in_stock,unit_price,expiry_date,minimum_stock_level,is_active) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+    DISPLAY_ALL_MEDICINE ="SELECT * FROM medicine_inventory"
+    INSERT_MEDICINE = "INSERT INTO medicine_inventory (medicine_id,medicine_name,generic_name,manufacturer,batch_number,quantity_in_stock,unit_price,expiry_date,minimum_stock_level) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)"
 
     def __init__(self):
         self.conn = DBConnection().get_connection()
@@ -26,7 +26,7 @@ class medicineDaoImp(medecineDaoService):
                             medicine.get_unit_price(),
                             medicine.get_expiry_date(),
                             medicine.get_minimum_stock_level(),
-                            medicine.get_is_active()
+                            # medicine.get_is_active()
                                 ))
             self.conn.commit()
             return cursor.rowcount == 1
@@ -36,7 +36,7 @@ class medicineDaoImp(medecineDaoService):
         finally:
             cursor.close()
 
-    def display_medicine(self)->List[Medicine]:
+    def display_all_medicine(self)->List[Medicine]:
         medicine = []#To store the records from db
         try:
             cursor = self.conn.cursor(DictCursor)#return data in dictionary format
@@ -49,7 +49,7 @@ class medicineDaoImp(medecineDaoService):
                                         manufacturer=row["manufacturer"],
                                         batch_number=row["batch_number"],
                                         quantity_in_stock=row["quantity_in_stock"],
-                                        unit_price=row["unit_price"],
+                                        unitprice=row["unit_price"],
                                         expiry_date=row["expiry_date"],
                                         minimum_stock_level=row["minimum_stock_level"],
                                         is_active = row["is_active"]

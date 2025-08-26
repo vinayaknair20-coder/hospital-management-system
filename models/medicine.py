@@ -4,7 +4,7 @@ import re
 class Medicine:
     """Python OOPs applied for Medicine management"""
     
-    def _init_(self, medicine_id=None, medicine_name=None,generic_name=None,manufacturer=None,batch_number=None,quantity_in_stock=None,unitprice=None,expiry_date=None,minimum_stock_level=None, is_active=None):
+    def __init__(self, medicine_id=None, medicine_name=None,generic_name=None,manufacturer=None,batch_number=None,quantity_in_stock=None,unitprice=None,expiry_date=None,minimum_stock_level=None, is_active=None):
         self.__medicine_id = medicine_id
         self.__medicine_name = medicine_name
         self.__generic_name = generic_name
@@ -31,7 +31,7 @@ class Medicine:
         pattern = re.compile(r"^[A-Za-z_]{2,30}$")
         
         if pattern.match(medicine_name):
-            self.__medicineame = medicine_name
+            self.__medicine_name = medicine_name
         else:
             raise ValueError("Invalid medicine name: must contain only alphabets and underscores, length 2-30 characters")
         
@@ -51,7 +51,7 @@ class Medicine:
     def get_unit_price(self):
         return self.__unitprice
     
-    def set_price(self, unitprice):
+    def set_unit_price(self, unitprice):
         if unitprice is not None and unitprice < 0:
             raise ValueError("Price cannot be negative")
         self.__unitprice = unitprice
@@ -94,8 +94,8 @@ class Medicine:
     def get_is_active(self):
         return self.__is_active
     
-    def set_is_active(self,is_active):
-        self.__is_active = is_active
+    # def set_is_active(self,is_active):
+    #     self.__is_active = is_active
 
-    def _str_(self):
-        return f"Medicine ID: {self.__medicine_id:<10}, Medicine Name: {self.__medicine_name:<15},Generic Name:{self.__generic_name} Price: {self.__unitprice:<10}, Manufactu: {self.__manufacturer},batch_number:{self.__batch_number},quantity_in_stock:{self.__quantity_in_stock},expiry_date:{self.__expiry_date},minimum_stock_level:{self.__minimum_stock_level},is_active:{self.__is_active}"
+    def __str__(self):
+        return f"Medicine ID: {self.__medicine_id}, Medicine Name: {self.__medicine_name},Generic Name:{self.__generic_name}, unitPrice: {self.__unitprice}, Manufacturer: {self.__manufacturer},batch_number:{self.__batch_number},quantity_in_stock:{self.__quantity_in_stock},expiry_date:{self.__expiry_date},minimum_stock_level:{self.__minimum_stock_level}"

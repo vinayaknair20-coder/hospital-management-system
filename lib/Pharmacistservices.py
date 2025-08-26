@@ -17,75 +17,31 @@ class MedicineManagementLib:
     @staticmethod
     def insert_medicine():
         medicine=Medicine()
-        medicine_id = int(input("Enter the medicine:"))
+        medicine_id = int(input("Enter the medicine ID:"))
         medicine.set_medicine_id(medicine_id)
-        medicine_name = input("Enter the medicine name:")
-        product.set_unitprice(unitprice)
-        categoryid = int(input("Enter the ctaegory ID:"))
-        product.set_categoryid(categoryid)
-        m_date = input("Enter manufacture Date(dd/mm/yyyy):")
-        util_date = datetime.strptime(m_date, "%d/%m/%Y")
+        medicine_name = input("Enter the medicine name:") 
+        medicine.set_medicine_name(medicine_name)
+        generic_name= input("Enter the generic name:")
+        medicine.set_gen_medicine_name(generic_name)
+        manufacturer= input("Enter the manufacturer:")
+        medicine.set_manufacturer(manufacturer)
+        batch_number= int(input("Enter the batch number:"))
+        medicine.set_batch_number(batch_number)
+        quantity_in_stock= int(input("Enter quantity in stock:"))
+        medicine.set_quantity_in_stock(quantity_in_stock)
+        unit_price= int(input("Enter the unit price:"))
+        medicine.set_unit_price(unit_price)
+        expiry_date = input("Enter expiry Date(dd/mm/yyyy):")
+        util_date = datetime.strptime(expiry_date, "%d/%m/%Y")
         conv_m_date = util_date.date()
-        product.set_manufacture_date(conv_m_date)
-        product.set_is_active(is_active="Y")
-        if ProductManagementLib.dao_service.insert_products(product):
+        medicine.set_expiry_date(conv_m_date)
+        minimum_stock_level= int(input("Enter the minimum_stock_level:"))
+        medicine.set_minimum_stock_level(minimum_stock_level)
+        
+       
+        if MedicineManagementLib.dao_service.add_medicine(medicine):
             print("inserted successfully.........")
         else:
             print("something went wrong......")
 
-    @staticmethod
-    def update_product():
-        searchid = int(input("Enter the product ID"))
-        #create a method in DAO
-        product = ProductManagementLib.dao_service.find_by_product_id(searchid)
-        if not product:
-            print("Product not found")
-            return
-        print(product)
-        confirm = input("Do you wnat to edit this data?(y/n)")
-        if confirm.lower()=="y":
-            product.set_product_name(input("Enter new product Name: "))
-            product.set_unitprice(float(input("Enter new unit price: ")))
-        #pass the object to dao update
-            if ProductManagementLib.dao_service.update_product(product,searchid):
-                print("Updated successfully......")
-            else:
-                print("Something went wrong......")
     
-    @staticmethod
-    def disable_product():
-        searchid = int(input("Enter the product ID to disable"))
-
-        product = ProductManagementLib.dao_service.find_by_product_id(searchid)
-        if not product:
-            print("Product not found")
-            return
-        print(product)
-        confirm = input("Do you wnat to disable this product?(y/n)")
-        if confirm.lower()=="y":
-            if ProductManagementLib.dao_service.disable_product(searchid):
-                print("disable successfull.......")
-            else:
-                print("Something went wrong......")
-
-    @staticmethod
-    def search_by_product_id():
-        searchid = int(input("Enter the product ID to search"))
-
-        product = ProductManagementLib.dao_service.find_by_product_id(searchid)
-        if not product:
-            print("Product not found")
-            return
-        print(product)
-            
-
-    @staticmethod
-    def apply_gst_to_product():
-        product_id = int(input("Enter the product ID to apply GST:"))
-        gst_percent = float(input("Enter GST percentage to apply:"))
-        if ProductManagementLib.dao_service.apply_gst(product_id,gst_percent):
-            print(f"GST of {gst_percent} applied to product ID {product_id}")
-        else:
-            print("failed to apply GST")
-        
-            
