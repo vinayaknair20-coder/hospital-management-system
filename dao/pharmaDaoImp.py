@@ -15,6 +15,7 @@ class medicineDaoImp(medecineDaoService):
 
     def add_medicine(self,medicine:Medicine)->bool:
         try:
+            self.conn.ping(reconnect=True)
             cursor = self.conn.cursor()#create a cursor object
             cursor.execute(self.INSERT_MEDICINE,
                            (medicine.get_medicine_id(),
@@ -39,6 +40,7 @@ class medicineDaoImp(medecineDaoService):
     def display_all_medicine(self)->List[Medicine]:
         medicine = []#To store the records from db
         try:
+            self.conn.ping(reconnect=True)
             cursor = self.conn.cursor(DictCursor)#return data in dictionary format
             cursor.execute(self.DISPLAY_ALL_MEDICINE)#fire the query
             rows = cursor.fetchall()
