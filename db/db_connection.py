@@ -1,8 +1,10 @@
 # importing multiple libraries to run mysql connectors
 
 import pymysql
-import configparser 
+from configparser import ConfigParser
 from pymysql.err import MySQLError
+import os
+from pymysql import cursors
 
 # creating  connection class
 class DBConnection:
@@ -24,8 +26,10 @@ class DBConnection:
 
         try:
             # loading the config file
-            config=configparser.ConfigParser()
-            config.read('db_config.ini') #extracted datas frm file into a dictionary format
+            config=ConfigParser()
+            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            config_path = os.path.join(project_root,'db_config.ini')
+            config.read(config_path) #extracted datas frm file into a dictionary format
             # establishing mysql connetion
             self.connection=pymysql.connect(
                 host=config.get('mysql','host'),

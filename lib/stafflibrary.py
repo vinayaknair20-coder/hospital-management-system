@@ -2,14 +2,13 @@ import hashlib
 from dao.staff_dao import StaffDao
 from validation.admin_validation import validate_name, validate_age, validate_phone, validate_email, validate_date
 
-
 class StaffLibrary:
     def __init__(self):
         self.dao = StaffDao()
 
     def create_staff(self):
         try:
-            staff_id = self.dao.get_next_staff_id()  # Auto staff ID
+            staff_id = self.dao.get_next_staff_id()
             staff_name = validate_name(input("Enter Staff Name: "))
             role_id = input("Enter Role ID: ")
             age = validate_age(input("Enter Age: "))
@@ -17,18 +16,18 @@ class StaffLibrary:
             email = validate_email(input("Enter Email: "))
             doj = validate_date(input("Enter Date of Joining (YYYY-MM-DD): "))
 
-            # Auto-generate password
+            # Generate default password (plain text)
             default_password = (staff_name[:5].lower() + phone_number[-4:]) if phone_number else "password@123"
-            password_hash = hashlib.sha256(default_password.encode()).hexdigest()
-
+            
             print(f"Generated Staff ID: {staff_id}")
             print(f"Default Password : {default_password}")
 
-            # Save staff to DB
+            # Pass PLAIN TEXT password to DAO (let DAO handle hashing)
             self.dao.add_staff(
                 staff_id, staff_name, role_id, age,
-                phone_number, email, doj, password_hash
+                phone_number, email, doj, default_password  # Plain text password
             )
+            
         except ValueError as ve:
             print(f"❌ Validation Error: {ve}")
         except Exception as e:
