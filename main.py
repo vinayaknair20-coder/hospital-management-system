@@ -19,7 +19,7 @@ def test_database_connection():
     """Test database connection at startup"""
     try:
         conn = DBConnection().get_connection()
-        print("✅ Database connected successfully!")
+        print(" Database connected successfully!")
         conn.close()
         return True
     except Exception as e:
@@ -56,7 +56,7 @@ def admin_menu():
 
 def receptionist_menu():
     """Receptionist Dashboard - Patient & Appointment Management"""
-    print("\n👩 Welcome to Receptionist Dashboard")
+    print("\n Welcome to Receptionist Dashboard")
     while True:
         print("\n========== RECEPTIONIST SERVICES ==========")
         print("1. PATIENT MANAGEMENT")
@@ -78,7 +78,7 @@ def receptionist_menu():
         elif choice == "4":
             break
         else:
-            print("❌ Invalid choice! Please enter 1-4.")
+            print(" Invalid choice! Please enter 1-4.")
 
 
 def patient_management_menu():
@@ -147,7 +147,7 @@ def pharmacist_menu():
         print("\n========== PRODUCT MANAGEMENT MENU ==========")
         print("1. ADD MEDICINE")
         print("2. DISPLAY ALL MEDICINES")
-        # print("3. UPDATE MEDICINE")
+        print("3. BACK TO MAIN MENU")
         # print("4. DELETE MEDICINE")
         # print("5. SEARCH MEDICINE")
         # print("6. LOW STOCK ALERTS")
@@ -162,7 +162,7 @@ def pharmacist_menu():
             elif choice == "2":
                 MedicineManagementLib.display_medicine()
             elif choice == "3":
-                print(" Update Medicine - Coming Soon...")
+                break
             elif choice == "4":
                 print(" Delete Medicine - Coming Soon...")
             elif choice == "5":
