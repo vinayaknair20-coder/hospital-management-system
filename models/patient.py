@@ -1,6 +1,6 @@
 from validation.receptionist_validation import validate_name,validate_DOB,validate_age,validate_gender,validate_blood_group,validate_phone_number,validate_email,validate_address,validate_emergency_contact
 class Patient:
-    def __init__(self,patient_id,patient_name =None,DOB=None,age = None,gender = None,blood_group = None,phone_number = None,email=None,address = None,emergency_contact=None,is_active='1'):
+    def __init__(self,patient_id=None,patient_name =None,DOB=None,age = None,gender = None,blood_group = None,phone_number = None,email=None,address = None,emergency_contact=None,is_active='1'):
         self.__patient_id = patient_id
         self.__patient_name = patient_name
         self.__DOB = DOB
@@ -97,5 +97,15 @@ class Patient:
     def is_active(self,value):
           self.__is_active = value
 
-    def __str__(self):
-        return f"Patient_ID: {self.__patient_id},PatientName :{self.__patient_name},Date_Of_Birth:{self.__DOB}, PatientAge :{self.__age}, Gender :{self.__gender},BloodGroup: {self.__blood_group}, PhoneNumber :{self.__phone_number},Email :{self.__email},PatientAddress :{self.__address}, EmergencyContact:{self.__emergency_contact}, is_active:{self.__is_active}"
+    def _str_(self):
+        return (f"Patient_ID  : {self.__patient_id}\n"
+                f"Patient Name     : {self.__patient_name}\n"
+                f"Date Of Birth    : {self.__DOB}\n"
+                f"Patient Age      : {self.__age}\n"
+                f"Gender           : {self.__gender}\n"
+                f"Blood Group      : {self.__blood_group}\n"
+                f"Phone Number     : {self.__phone_number}\n"
+                f"Email            : {self.__email}\n"
+                f"Patient Address  : {self.__address}\n"
+                f"Emergency Contact: {self.__emergency_contact}\n"
+                f"Is Active        : {self.__is_active}")

@@ -10,6 +10,7 @@ from dao.staff_dao import StaffDao
 from lib.admin_library import AdminLibrary
 from lib.stafflibrary import StaffLibrary
 from lib.labtechmanagementlib import LabtechManagementLib
+from lib.PatientManagementLib import ReceptionistServices
 # Uncomment these when ready:
 # from lib.PatientManagementLib import ReceptionistServices
 # from lib.menudriven import DoctorServices
@@ -124,24 +125,32 @@ def test_database_connection():
         return False
 
 def receptionist_menu():
-    print("\n🏥 Welcome to Receptionist Dashboard")
+    print("Welcome to Receptionist Dashboard")
     while True:
-        print("\n========== RECEPTIONIST SERVICES ==========")
-        print("1. PATIENT MANAGEMENT")
-        print("2. APPOINTMENTS")
-        print("3. BILLING")
-        print("4. GO TO MAIN MENU")
-        choice = input("Enter your choice: ").strip()
-        if choice == "1":
-            patient_management_menu()
-        elif choice == "2":
-            print("🚧 Appointment booking - Coming Soon...")
-        elif choice == "3":
-            print("🚧 Billing System - Coming Soon...")
-        elif choice == "4":
+        print('SERVICES\n1. PATIENT\n2. APPOINTMENTS\n3. BILLING\n4. EXIT')
+        choice=input('enter your choice: ')
+        if choice=='1':
+            while True:
+                print('SERVICES\n1.ADD PATIENT\n2.DISPLAY PATIENT\n3.SEARCH PATIENT\n4.UPDATE PATIENT\n5.EXIT')
+                choice=input('enter your choice: ')
+                if choice=='1':
+                    ReceptionistServices.add_patients()
+                elif choice=='2':
+                    ReceptionistServices.display_all()
+                elif choice=='3':
+                    ReceptionistServices.search_patient()
+                elif choice =='4':
+                    ReceptionistServices.update_patient()
+                elif choice =='5':
+                    break
+                else:
+                    print("Invalid Choice, Try Again !!!")
+        elif choice=='2':
+            ReceptionistServices.book_appointment()
+        elif choice=='4':
             break
         else:
-            print("❌ Invalid choice! Please enter 1-4.")
+            print("Invalid Choice, try again !!!")
 
 def patient_management_menu():
     print("\n========== PATIENT MANAGEMENT ==========")
@@ -193,22 +202,21 @@ def pharmacist_menu():
         else:
             print("❌ Invalid choice! Please enter 1-3.")
 
-def lab_technician_menu():
-    print("\n🧪 Welcome to Lab Technician Dashboard")
+
+def lab_technician():
+    print("Welcome to Lab_Technician Dashboard")
     while True:
-        print("\n========== LAB SERVICES ==========")
-        print("1. ADD TEST")
-        print("2. DISPLAY ALL TESTS")
-        print("3. BACK TO MAIN MENU")
-        choice = input("Enter your choice: ").strip()
-        if choice == "1":
+        print('services\n1.ADD TEST\n2.LIST TEST\n3.EXIT')
+        choice=input('enter choice: ')
+        if choice=='1':
             LabtechManagementLib.create_test()
-        elif choice == "2":
+        elif choice=='2':
             LabtechManagementLib.display_all()
-        elif choice == "3":
+        elif choice=='3':
             break
         else:
-            print("❌ Invalid choice! Please enter 1-3.")
+            print("Try again")
+     
 
 def display_welcome_banner():
     print("=" * 50)
@@ -256,8 +264,8 @@ def main():
                     doctor_menu()
                 elif role == "pharmacist":
                     pharmacist_menu()
-                elif role == "lab technician":
-                    lab_technician_menu()
+                elif role == "lab tech":
+                    lab_technician()
                 else:
                     print(f"❌ Role '{role}' not recognized.")
         elif choice == "2":

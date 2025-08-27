@@ -3,6 +3,7 @@ from db.db_connection import DBConnection
 from dao.abstractpatientdao import PatientDaoService
 from models.patient import Patient
 from typing import List
+import pymysql
 
 class PatientDaoImplementation(PatientDaoService):
     ADD_PATIENT = "INSERT INTO patients(patient_name,DOB,age,gender,blood_group,phone_number,email,address,emergency_contact) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)"
@@ -27,7 +28,7 @@ class PatientDaoImplementation(PatientDaoService):
     def display_all_patients(self)->List[Patient]:
             patients=[]  #to store the records from db
             try:
-                cursor = self.conn.cursor(dictionary=True)  #return data in dic 
+                cursor = self.conn.cursor(pymysql.cursors.DictCursor)  #return data in dic 
                 cursor.execute(self.DISPLAY_ALL) #fire the query
                 rows = cursor.fetchall()
                 for row in rows:
@@ -51,7 +52,7 @@ class PatientDaoImplementation(PatientDaoService):
     def find_by_patient_id(self, patient_id:int):
             patient = None
             try:
-                cursor = self.conn.cursor(dictionary=True)
+                cursor = self.conn.cursor(pymysql.cursors.DictCursor)
                 cursor.execute(self.FIND_BY_ID,(patient_id,))    #we put comma bcoz in tuple single value pass cheyumbo we should put comma
                 row = cursor.fetchone()
                 if row:
@@ -74,7 +75,7 @@ class PatientDaoImplementation(PatientDaoService):
         
     def update_patient(self,patient:Patient,patient_id:int)->bool:
             try:
-                cursor = self.conn.cursor(dictionary=True)
+                cursor = self.conn.cursor(pymysql.cursors.DictCursor)
                 cursor.execute(self.UPDATE_PATIENT,
                                (patient.patient_name,
                                patient.age,patient_id))
