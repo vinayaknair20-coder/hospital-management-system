@@ -23,3 +23,5 @@ Thumbs.db
 
 #config
 db_config.ini
+
+main.py
