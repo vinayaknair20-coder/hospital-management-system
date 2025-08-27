@@ -1,5 +1,5 @@
-from dao.AbstractPatientDao import PatientDaoService
-from dao.PatientDaoImp import PatientDaoImplementation
+from dao.abstractpatientdao import PatientDaoService
+from dao.patientDaoImp import PatientDaoImplementation
 from models.patient import Patient
 from datetime import datetime
 from validation.receptionist_validation import validate_name,validate_DOB,validate_age,validate_gender,validate_blood_group,validate_phone_number,validate_email,validate_address,validate_emergency_contact

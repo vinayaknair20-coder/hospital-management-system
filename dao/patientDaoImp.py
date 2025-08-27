@@ -1,6 +1,6 @@
 from datetime import datetime
 from db.db_connection import DBConnection
-from dao.AbstractPatientDao import PatientDaoService
+from dao.abstractpatientdao import PatientDaoService
 from models.patient import Patient
 from typing import List
 
