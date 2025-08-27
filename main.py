@@ -11,6 +11,7 @@ from lib.admin_library import AdminLibrary
 from lib.stafflibrary import StaffLibrary
 from lib.labtechmanagementlib import LabtechManagementLib
 from lib.PatientManagementLib import ReceptionistServices
+from lib.doc_managementlib import DoctorServices
 # Uncomment these when ready:
 # from lib.PatientManagementLib import ReceptionistServices
 # from lib.menudriven import DoctorServices
@@ -168,22 +169,40 @@ def patient_management_menu():
         else:
             print("❌ Invalid choice! Please enter 1-5.")
 
+
 def doctor_menu():
-    print("\n👩‍⚕️ Welcome to Doctor Dashboard")
-    while True:
-        print("\n========== DOCTOR SERVICES ==========")
-        print("1. APPOINTMENTS")
-        print("2. CONSULTATIONS")
-        print("3. PRESCRIPTIONS")
-        print("4. PATIENT RECORDS")
-        print("5. GO TO MAIN MENU")
-        choice = input("Enter your choice: ").strip()
-        if choice in ["1", "2", "3", "4"]:
-            print("🚧 Doctor services not implemented yet.")
-        elif choice == "5":
-            break
-        else:
-            print("❌ Invalid choice! Please enter 1-5.")
+        while True:
+            print(" Welcome to Doctor Dashboard")
+            print('SERVICES\n1.Appointments\n2.Consultations\n3.Prescriptions\n4.Go to main menu')
+            choice=input('enter your choice:')
+            if choice=='1':
+                DoctorServices.display_appointments()
+            elif choice=='2':
+                while True:
+                    print('1.create consultation\n2.display consultation by patient id\n3.go back')
+                    option=input('enter your choice: ')
+                    if option=='1':
+                        DoctorServices.create_new_consultation()
+                    elif option=='2':
+                        DoctorServices.view_patient_consultation()
+                    elif option=='3':
+                        break
+                    else:
+                        print('invalid option')
+            elif choice=='3':
+                while True:
+                    print('SERVICES\n1.ADD PRESCRIPTION\n2.list prescriptions by appointment id')
+                    ch=input('enter choice: ')
+                    if ch =='1':
+                        DoctorServices.create_prescription()
+                    elif ch=='2':
+                        DoctorServices.view_prescription_by_app_id()
+                    else:
+                        break
+            elif choice=='4':
+                break
+
+
 
 def pharmacist_menu():
     print("\n💊 Welcome to Pharmacist Dashboard")
