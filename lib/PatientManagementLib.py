@@ -166,6 +166,7 @@ class ReceptionistServices:
     @staticmethod
     def book_appointment():
         try:
+            # Get patient ID and validate
             patient_id = int(input('Enter Patient ID: '))
             patient = ReceptionistServices.dao_services.find_by_patient_id(patient_id)
             if not patient:
@@ -174,95 +175,98 @@ class ReceptionistServices:
 
             print(f"Patient Name for ID {patient_id}: {patient.patient_name}")
 
-            # Patient name validation loop
+            # Patient name validation
             while True:
                 entered_name = input('Enter the patient name: ')
                 if entered_name.strip().lower() == patient.patient_name.strip().lower():
                     patient_name = entered_name
                     break
                 else:
-                    print("Entered name does not match the name for this Patient ID. Please try again.")
+                    print("Entered name does not match. Please try again.")
 
-            # Specialization validation
+            # Get specializations
             specializations = ReceptionistServices.dao_services.get_specializations()
-            spec_ids = [spec[0] for spec in specializations]
+            if not specializations:
+                print("No specializations available.")
+                return
+
             print("Available Specializations:")
             for spec in specializations:
-                print(f"{spec[0]} - {spec[1]}")
-            while True:
-                specialization_id = int(input('Enter the specialization id: '))
-                if specialization_id in spec_ids:
-                    break
-                print("Invalid specialization id! Please choose a valid one from the list above.")
+                print(f"{spec['specialization_id']} - {spec['specialization_name']}")
 
-            # Appointment date validation
+            # Get specialization choice
+            while True:
+                try:
+                    specialization_id = int(input('Enter the specialization id: '))
+                    if any(spec['specialization_id'] == specialization_id for spec in specializations):
+                        break
+                    print("Invalid specialization id!")
+                except ValueError:
+                    print("Please enter a valid number.")
+
+            # Get appointment date
             while True:
                 appointment_date = input("Enter the appointment date (YYYY-MM-DD): ")
                 try:
                     appt_date_obj = datetime.strptime(appointment_date, "%Y-%m-%d").date()
-                    today = datetime.today().date()
-                    if appt_date_obj >= today:
+                    if appt_date_obj >= datetime.today().date():
                         break
                     else:
-                        print("Appointment date cannot be in the past! Please enter today or a future date.")
+                        print("Date cannot be in the past!")
                 except ValueError:
-                    print("Invalid date format! Please enter in YYYY-MM-DD format.")
+                    print("Invalid date format!")
 
-            # Doctor validation
+            # Get doctors for specialization
             doctors = ReceptionistServices.dao_services.get_doctors()
-            filtered_doctors = [doc for doc in doctors if doc[2] == specialization_id]
-            valid_doctor_ids = [doc[0] for doc in filtered_doctors]
-            print("Available Doctors with selected specialization:")
+            filtered_doctors = [doc for doc in doctors if doc['specialization_id'] == specialization_id]
+            
+            if not filtered_doctors:
+                print("No doctors available for this specialization.")
+                return
+
+            print("Available Doctors:")
             for doc in filtered_doctors:
-                print(f"{doc[0]} - {doc[2]}")
+                print(f"Doctor ID: {doc['doctor_id']}")
+
+            # Get doctor choice
             while True:
-                doctor_id = int(input("Enter Doctor ID: "))
-                if doctor_id in valid_doctor_ids:
-                    break
-                print("Invalid Doctor ID! Please choose from the list above.")
-
-            # Token selection + booking loop
-            all_tokens = list(range(1, 26))  # 1–25 tokens
-
-            while True:   # loop until appointment booked successfully
-                booked_tokens = ReceptionistServices.dao_services.get_booked_tokens(doctor_id, appointment_date)
-
-                print(f"Tokens for Doctor {doctor_id} on {appointment_date}:")
-                print(f"Booked tokens: {booked_tokens}")
-
                 try:
-                    token_number = int(input("Enter the token number (1-25): "))
-
-                    if token_number not in all_tokens:
-                        print("Invalid token! Please enter a number between 1 and 25.")
-                        continue
-                    elif token_number in booked_tokens:
-                        print(f"Token {token_number} is already taken! Please choose another one.")
-                        continue
-
-                    # Create appointment object
-                    appointment = Appointments(
-                        patient_id=patient_id,
-                        patient_name=patient_name,
-                        appointment_date=appt_date_obj,
-                        doctor_id=doctor_id,
-                        token_number=token_number,
-                        specialization_id=specialization_id
-                    )
-
-                    #  Try booking
-                    if ReceptionistServices.dao_services.add_appointment(appointment):
-                        print("Appointment booked successfully.")
-                        break  
-                    else:
-                        print("Failed to book appointment. Please try another token.")
-                        continue
-
+                    doctor_id = int(input("Enter Doctor ID: "))
+                    if any(doc['doctor_id'] == doctor_id for doc in filtered_doctors):
+                        break
+                    print("Invalid Doctor ID!")
                 except ValueError:
-                    print("Invalid input! Please enter a numeric token number.")
+                    print("Please enter a valid number.")
+
+            # Get token number
+            while True:
+                try:
+                    token_number = int(input("Enter token number (1-25): "))
+                    if 1 <= token_number <= 25:
+                        break
+                    print("Token must be between 1-25!")
+                except ValueError:
+                    print("Please enter a valid number.")
+
+            # Create and save appointment
+            appointment = Appointments(
+                patient_id=patient_id,
+                patient_name=patient_name,
+                appointment_date=appt_date_obj,
+                doctor_id=doctor_id,
+                token_number=token_number,
+                specialization_id=specialization_id,
+                status="SCHEDULED"
+            )
+
+            if ReceptionistServices.dao_services.add_appointment(appointment):
+                print("Appointment booked successfully!")
+            else:
+                print("Failed to book appointment.")
+
         except Exception as e:
-                print("Error while booking appointment:", e)
-                print("Please try entering another token.")
+            print(f"Error while booking appointment: {e}")
+
 
 
         

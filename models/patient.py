@@ -97,7 +97,7 @@ class Patient:
     def is_active(self,value):
           self.__is_active = value
 
-    def _str_(self):
+    def __str__(self):
         return (f"Patient_ID  : {self.__patient_id}\n"
                 f"Patient Name     : {self.__patient_name}\n"
                 f"Date Of Birth    : {self.__DOB}\n"

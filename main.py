@@ -126,13 +126,13 @@ def test_database_connection():
         return False
 
 def receptionist_menu():
-    print("Welcome to Receptionist Dashboard")
+    print("========== Welcome to Receptionist Dashboard ==========")
     while True:
-        print('SERVICES\n1. PATIENT\n2. APPOINTMENTS\n3. BILLING\n4. EXIT')
+        print('============== SERVICES ================\n1. PATIENT\n2. APPOINTMENTS\n3. BILLING\n4. EXIT')
         choice=input('enter your choice: ')
         if choice=='1':
             while True:
-                print('SERVICES\n1.ADD PATIENT\n2.DISPLAY PATIENT\n3.SEARCH PATIENT\n4.UPDATE PATIENT\n5.EXIT')
+                print('============== SERVICES ==============\n1.ADD PATIENT\n2.DISPLAY PATIENT\n3.SEARCH PATIENT\n4.UPDATE PATIENT\n5.EXIT')
                 choice=input('enter your choice: ')
                 if choice=='1':
                     ReceptionistServices.add_patients()
@@ -147,11 +147,28 @@ def receptionist_menu():
                 else:
                     print("Invalid Choice, Try Again !!!")
         elif choice=='2':
-            ReceptionistServices.book_appointment()
+            while True:
+                print('=============== SERVICES ==============\n1.BOOK APPOINTMENT\n2.VIEW ALL APPOINTMENTS\n3.SEARCH APPOINTMENT USING PATIENT ID\n4.RESCHEDULE APPOINTMENT\n5.CANCEL APPOINTMENT\n6.EXIT')
+                choice=input('enter your choice: ')
+                if choice=='1':
+                    ReceptionistServices.book_appointment()
+                elif choice=='2':  
+                    ReceptionistServices.display_all_appointments()
+                elif choice=='3':
+                    ReceptionistServices.search_appointment()
+                elif choice=='4':
+                    ReceptionistServices.reschedule_appointment()
+                elif choice=='5':
+                    ReceptionistServices.cancel_appointment()
+                elif choice=='6':
+                    break
+                else:
+                    print("Invalid Choice, Try Again !!!")   
         elif choice=='4':
             break
         else:
             print("Invalid Choice, try again !!!")
+
 
 def patient_management_menu():
     print("\n========== PATIENT MANAGEMENT ==========")
