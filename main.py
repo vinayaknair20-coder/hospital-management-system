@@ -228,31 +228,45 @@ def doctor_menu():
 
 
 def pharmacist_menu():
-    print("\n💊 Welcome to Pharmacist Dashboard")
+    print("\nPHARMACY MANAGEMENT MENU")
     while True:
-        print("\n========== MEDICINE MANAGEMENT MENU ==========")
-        print("1. ADD MEDICINE")
-        print("2. DISPLAY ALL MEDICINES")
-        print("3. UPDATE MEDICINE")
-        print("4. DISABLE MEDICINE")
-        print("5. SEARCH MEDICINE BY ID")
-        print("6. BACK TO MAIN MENU")
+        print("\n" + "="*60)
+        print("PHARMACY MANAGEMENT OPTIONS")
+        print("="*60)
+        print("1. Add Medicine")
+        print("2. Display All Medicines")
+        print("3. Update Medicine")
+        print("4. Disable Medicine")
+        print("5. Search Medicine By ID")
+        # print("6. Search Medicines By Type")
+        print("6. Stock Alerts")
+        print("7. Medicine Statistics")
+        print("8. Go To Main Menu")
+        choice = input("Enter your choice (1-9): ").strip()
+        try:
+            if choice == "1":
+                MedicineManagementLib.insert_medicine()
+            elif choice == "2":
+                MedicineManagementLib.display_medicine()
+            elif choice == "3":
+                MedicineManagementLib.update_medicine()
+            elif choice == "4":
+                MedicineManagementLib.disable_medicine()
+            elif choice == "5":
+                MedicineManagementLib.search_by_medicine_id()
+            # elif choice == "6":
+            #     MedicineManagementLib.search_by_medicine_type()
+            elif choice == "6":
+                MedicineManagementLib.show_stock_alerts()
+            elif choice == "7":
+                MedicineManagementLib.show_medicine_statistics()
+            elif choice == "8":
+                break
+            else:
+                print("Invalid choice. Please enter a number between 1-9.")
+        except Exception as e:
+            print("Error in pharmacy services:",e)
 
-        choice = input("Enter your choice: ").strip()
-        if choice == "1":
-            MedicineManagementLib.insert_medicine()
-        elif choice == "2":
-            MedicineManagementLib.display_medicine()
-        elif choice == "3":
-            MedicineManagementLib.update_medicine()
-        elif choice == "4":
-            MedicineManagementLib.disable_medicine()
-        elif choice == "5":
-            MedicineManagementLib.search_by_medicine_id()
-        elif choice == "6":
-            break
-        else:
-            print("❌ Invalid choice! Please enter 1-6.")
 
 
 def lab_technician():
