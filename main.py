@@ -210,7 +210,11 @@ def pharmacist_menu():
         print("\n========== MEDICINE MANAGEMENT MENU ==========")
         print("1. ADD MEDICINE")
         print("2. DISPLAY ALL MEDICINES")
-        print("3. BACK TO MAIN MENU")
+        print("3. UPDATE MEDICINE")
+        print("4. DISABLE MEDICINE")
+        print("5. SEARCH MEDICINE BY ID")
+        print("6. BACK TO MAIN MENU")
+
         choice = input("Enter your choice: ").strip()
         if choice == "1":
             MedicineManagementLib.insert_medicine()
@@ -225,7 +229,7 @@ def pharmacist_menu():
         elif choice == "6":
             break
         else:
-            print("❌ Invalid choice! Please enter 1-3.")
+            print("❌ Invalid choice! Please enter 1-6.")
 
 
 def lab_technician():
