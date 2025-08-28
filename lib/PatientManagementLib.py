@@ -2,6 +2,7 @@ from dao.abstractpatientdao import PatientDaoService
 from dao.patientDaoImp import PatientDaoImplementation
 from models.patient import Patient
 from models.appointments import Appointments
+from models.billing import Billing
 from datetime import datetime
 from validation.receptionist_validation import validate_name,validate_DOB,validate_age,validate_gender,validate_blood_group,validate_phone_number,validate_email,validate_address,validate_emergency_contact
 
@@ -340,7 +341,88 @@ class ReceptionistServices:
                 print(appointment)
         except Exception as e:
             print("Error while searching appointments:", e)
+#-----------BILLING----------------------------------------
+    @staticmethod
+    def add_bill():
+        try:
+            appointment_id = int(input("Enter Appointment ID: "))
 
+            # Step 1: Fetch appointment details
+            appointment = ReceptionistServices.dao_services.search_appointment_by_patient_id(appointment_id)
+            if not appointment:
+                print("Appointment not found! Please check the ID.")
+                return
+            patient_id = appointment.patient_id
+            patient_name = appointment.patient_name
+            doctor_id = appointment.doctor_id
+
+            # Step 2: Fetch doctor consultation fee
+            doctors = ReceptionistServices.dao_services.get_doctors()
+            consultation_fee = None
+            for doc in doctors:
+                if doc[0] == doctor_id:
+                    consultation_fee = doc[3]  # consultation_fee
+                    break
+
+            if consultation_fee is None:
+                print("Doctor not found! Cannot fetch consultation fee.")
+                return
+
+            # Step 3: Display details
+            print("\nAppointment Details:")
+            print(f"Patient ID         : {patient_id}")
+            print(f"Patient Name       : {patient_name}")
+            print(f"Doctor ID          : {doctor_id}")
+            print(f"Consultation Fee   : {consultation_fee}")
+
+            # Step 4: Choose payment method
+            payment_methods = ["Cash", "Card", "UPI"]
+            print("Payment Methods:")
+            for idx, method in enumerate(payment_methods, 1):
+                print(f"{idx}. {method}")
+
+            while True:
+                try:
+                    choice = int(input("Choose Payment Method (1-3): "))
+                    if 1 <= choice <= 3:
+                        payment_method = payment_methods[choice - 1]
+                        break
+                    else:
+                        print("Invalid choice! Select 1, 2, or 3.")
+                except ValueError:
+                    print("Enter numeric choice only!")
+
+            # Step 5: Insert bill
+            bill = Billing(
+                appointment_id=appointment_id,
+                patient_id=appointment.patient_id,
+                doctor_id=doctor_id,
+                consultation_fee=consultation_fee,
+                payment_method=payment_method,
+                payment_status="",  # will be decided in DAO
+                payment_date=datetime.now()
+            )
+
+            if ReceptionistServices.dao_services.insert_bill(bill):
+                print("Bill inserted successfully!")
+            else:
+                print("Failed to insert bill!")
+
+        except Exception as e:
+            print("Error while adding bill:", e)
+
+    @staticmethod
+    def show_bill():
+        try:
+            patient_id = int(input("Enter Patient ID to view bills: "))
+            bills = ReceptionistServices.dao_services.view_bill(patient_id)
+            if not bills:
+                print("No bills found for this patient.")
+                return
+            for bill in bills:
+                print(bill)
+        except Exception as e:
+            print("Error while viewing bills:", e)
 
 
             

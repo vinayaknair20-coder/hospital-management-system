@@ -3,6 +3,7 @@ from db.db_connection import DBConnection
 from dao.abstractpatientdao import PatientDaoService
 from models.patient import Patient
 from models.appointments import Appointments
+from models.billing import Billing
 from typing import List
 from pymysql.cursors import DictCursor
 
@@ -16,6 +17,11 @@ class PatientDaoImplementation(PatientDaoService):
     CANCEL_APPOINTMENT = "UPDATE appointments SET status='CANCELLED' WHERE appointment_id=%s"
     RESCHEDULE_APPOINTMENT = "UPDATE appointments SET appointment_date=%s WHERE appointment_id=%s"
     SEARCH_APPOINTMENT_BY_PATIENT_ID = "SELECT * FROM appointments WHERE patient_id=%s"
+    INSERT_BILL = "INSERT INTO receptionist_billing (patient_id, appointment_id, doctor_id, consultation_fee, payment_status, payment_method, payment_date) VALUES(%s,%s,%s,%s,%s,%s,%s)"
+    VIEW_BILL = "SELECT bill_id, patient_id, appointment_id, doctor_id, consultation_fee, payment_status, payment_method, payment_date FROM receptionist_billing WHERE patient_id=%s"
+
+
+
 
     def __init__(self):
         self.conn = DBConnection().get_connection() 
@@ -276,3 +282,98 @@ class PatientDaoImplementation(PatientDaoService):
             return []
         finally:
             cursor.close()
+#-------------BILLING-----------------------------
+    def search_appointment_by_id(self, appointment_id: int):
+        """
+        Fetch a single appointment by appointment_id.
+        Returns an Appointments object or None if not found.
+        """
+        try:
+            cursor = self.conn.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM appointments WHERE appointment_id = %s", (appointment_id,))
+            row = cursor.fetchone()
+            if row:
+                return Appointments(
+                    appointment_id=row["appointment_id"],
+                    patient_id=row["patient_id"],
+                    patient_name=row["patient_name"],
+                    doctor_id=row["doctor_id"],
+                    appointment_date=row["appointment_date"],
+                    token_number=row["token_number"],
+                    specialization_id=row["specialization_id"],
+                    status=row["status"]
+                )
+            else:
+                return None
+        except Exception as e:
+            print("Error fetching appointment by ID:", e)
+            return None
+        finally:
+            cursor.close()
+
+    
+    def insert_bill(self, bill: Billing) -> bool:
+        try:
+            cursor = self.conn.cursor()
+
+            # Step 1: Fetch patient_id and doctor_id from appointments
+            cursor.execute("SELECT patient_id, doctor_id FROM appointments WHERE appointment_id = %s",
+                        (bill.appointment_id,))
+            appointment = cursor.fetchone()
+            if not appointment:
+                print("Invalid Appointment ID!")
+                return False
+            patient_id, doctor_id = appointment
+
+            # Step 2: Fetch consultation fee from doctors table
+            cursor.execute("SELECT consultation_fee FROM doctors WHERE doctor_id = %s", (doctor_id,))
+            doc = cursor.fetchone()
+            if not doc:
+                print("Doctor not found!")
+                return False
+            consultation_fee = doc[0]
+
+            # Step 3: Set payment status automatically
+            payment_status = "COMPLETED" if bill.consultation_fee >= consultation_fee else "PENDING"
+
+            # Step 4: Insert into billing table
+            cursor.execute(self.INSERT_BILL, (
+                patient_id,
+                bill.appointment_id,
+                doctor_id,
+                consultation_fee,
+                payment_status,
+                bill.payment_method,
+                bill.payment_date
+            ))
+            self.conn.commit()
+            return cursor.rowcount == 1
+
+        except Exception as e:
+            print("Error adding bill:", e)
+            return False
+        finally:
+            cursor.close()
+
+
+    def view_bill(self, patient_id: int) -> List[Billing]:
+        bills = []
+        try:
+            cursor = self.conn.cursor(dictionary=True)
+            cursor.execute(self.VIEW_BILL, (patient_id,))
+            rows = cursor.fetchall()
+            for row in rows:
+                bills.append(Billing(bill_id=row["bill_id"],
+                                     patient_id=row["patient_id"],
+                                     appointment_id=row["appointment_id"],
+                                     doctor_id=row["doctor_id"],
+                                     consultation_fee=row["consultation_fee"],
+                                     payment_status=row["payment_status"],
+                                     payment_method=row["payment_method"],
+                                     payment_date=row["payment_date"]))
+        except Exception as e:
+            print("Error fetching bills:", e)
+        finally:
+            cursor.close()
+        return bills
+
