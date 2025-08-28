@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 from models.patient import Patient
 from models.appointments import Appointments
+from models.billing import Billing
 
 class PatientDaoService(ABC):
     @abstractmethod
@@ -45,6 +46,14 @@ class PatientDaoService(ABC):
         pass
     @abstractmethod
     def search_appointment_by_patient_id(self, patient_id: int):
+        pass
+    #-------------------------------------
+    @abstractmethod
+    def insert_bill(self, bills:Billing)->bool:
+        pass
+
+    @abstractmethod
+    def view_bill(self) -> List[Billing]:
         pass
 
   
