@@ -169,11 +169,24 @@ def receptionist_menu():
                 elif choice=='6':
                     break
                 else:
-                    print("Invalid Choice, Try Again !!!")   
+                    print("Invalid Choice, Try Again !!!")  
+        elif choice=='3':
+            while True:
+                print('=============== SERVICES ==============\n1.GENERATE BILL\n2.VIEW BILL\n3.EXIT')
+                choice=input('enter your choice: ')
+                if choice=='1':
+                    ReceptionistServices.add_bill() 
+                elif choice=='2':
+                    ReceptionistServices.show_bill()
+                elif choice=='3':
+                    break
+                else:
+                    print("Invalid Choice, Try Again !!!")
         elif choice=='4':
             break
         else:
             print("Invalid Choice, try again !!!")
+
 
 
 def patient_management_menu():

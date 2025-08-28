@@ -289,7 +289,7 @@ class PatientDaoImplementation(PatientDaoService):
         Returns an Appointments object or None if not found.
         """
         try:
-            cursor = self.conn.cursor(dictionary=True)
+            cursor = self.conn.cursor(DictCursor)
             cursor.execute("SELECT * FROM appointments WHERE appointment_id = %s", (appointment_id,))
             row = cursor.fetchone()
             if row:
@@ -314,7 +314,7 @@ class PatientDaoImplementation(PatientDaoService):
     
     def insert_bill(self, bill: Billing) -> bool:
         try:
-            cursor = self.conn.cursor()
+            cursor = self.conn.cursor(DictCursor)
 
             # Step 1: Fetch patient_id and doctor_id from appointments
             cursor.execute("SELECT patient_id, doctor_id FROM appointments WHERE appointment_id = %s",
@@ -323,7 +323,8 @@ class PatientDaoImplementation(PatientDaoService):
             if not appointment:
                 print("Invalid Appointment ID!")
                 return False
-            patient_id, doctor_id = appointment
+            patient_id = appointment['patient_id']  # Correct - access dict keys
+            doctor_id = appointment['doctor_id']
 
             # Step 2: Fetch consultation fee from doctors table
             cursor.execute("SELECT consultation_fee FROM doctors WHERE doctor_id = %s", (doctor_id,))
@@ -331,7 +332,7 @@ class PatientDaoImplementation(PatientDaoService):
             if not doc:
                 print("Doctor not found!")
                 return False
-            consultation_fee = doc[0]
+            consultation_fee = doc['consultation_fee']  # Correct - accessing dict key
 
             # Step 3: Set payment status automatically
             payment_status = "COMPLETED" if bill.consultation_fee >= consultation_fee else "PENDING"
@@ -359,7 +360,7 @@ class PatientDaoImplementation(PatientDaoService):
     def view_bill(self, patient_id: int) -> List[Billing]:
         bills = []
         try:
-            cursor = self.conn.cursor(dictionary=True)
+            cursor = self.conn.cursor(DictCursor)
             cursor.execute(self.VIEW_BILL, (patient_id,))
             rows = cursor.fetchall()
             for row in rows:
