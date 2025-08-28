@@ -1,12 +1,12 @@
-from dao.absatractDaoPharma import medecineDaoService
-from dao.pharmaDaoImp import medicineDaoImp
+from dao.absatractDaoPharma import MedecineDaoService
+from dao.pharmaDaoImp import MedicineDaoImp
 from models.medicine import Medicine
 from datetime import datetime
 
 class MedicineManagementLib:
     'handles CRUD logic'
 
-    dao_service : medecineDaoService = medicineDaoImp()
+    dao_service : MedecineDaoService = MedicineDaoImp()
 
     @staticmethod
     def display_medicine():
@@ -43,5 +43,51 @@ class MedicineManagementLib:
             print("inserted successfully.........")
         else:
             print("something went wrong......")
+
+    @staticmethod
+    def update_medicine():
+        searchid = int(input("Enter the medicine ID"))
+        #create a method in DAO
+        medicine = MedicineManagementLib.dao_service.find_by_medicine_id(searchid)
+        if not medicine:
+            print("medicine not found")
+            return
+        print(medicine)
+        confirm = input("Do you wnat to edit this data?(y/n)")
+        if confirm.lower()=="y":
+            medicine.set_medicine_name(input("Enter new product Name: "))
+            medicine.set_unit_price(float(input("Enter new unit price: "))
+                            )
+        #pass the object to dao update
+            if MedicineManagementLib.dao_service.update_medicine(medicine,searchid):
+                print("Updated successfully......")
+            else:
+                print("Something went wrong......")
+    
+    @staticmethod
+    def disable_medicine():
+        searchid = int(input("Enter the medicine ID to disable"))
+
+        medicine = MedicineManagementLib.dao_service.find_by_medicine_id(searchid)
+        if not medicine:
+            print("medicine not found")
+            return
+        print(medicine)
+        confirm = input("Do you wnat to disable this medicine?(y/n)")
+        if confirm.lower()=="y":
+            if MedicineManagementLib.dao_service.disable_medicine(searchid):
+                print("disable successfull.......")
+            else:
+                print("Something went wrong......")
+
+    @staticmethod
+    def search_by_medicine_id():
+        searchid = int(input("Enter the medicine ID to search"))
+
+        medicine = MedicineManagementLib.dao_service.find_by_medicine_id(searchid)
+        if not medicine:
+            print("medicine not found")
+            return
+        print(medicine)
 
     

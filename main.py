@@ -146,9 +146,9 @@ def pharmacist_menu():
         print("\n========== PRODUCT MANAGEMENT MENU ==========")
         print("1. ADD MEDICINE")
         print("2. DISPLAY ALL MEDICINES")
-        # print("3. UPDATE MEDICINE")
-        # print("4. DELETE MEDICINE")
-        # print("5. SEARCH MEDICINE")
+        print("3. UPDATE MEDICINE")
+        print("4. DELETE MEDICINE")
+        print("5. SEARCH MEDICINE")
         # print("6. LOW STOCK ALERTS")
         # print("7. EXPIRY ALERTS")
         # print("8. GO TO MAIN MENU")
@@ -161,11 +161,11 @@ def pharmacist_menu():
             elif choice == "2":
                 MedicineManagementLib.display_medicine()
             elif choice == "3":
-                print(" Update Medicine - Coming Soon...")
+                MedicineManagementLib.update_medicine()
             elif choice == "4":
-                print(" Delete Medicine - Coming Soon...")
+                MedicineManagementLib.disable_medicine()
             elif choice == "5":
-                print(" Search Medicine - Coming Soon...")
+                MedicineManagementLib.search_by_medicine_id()
             elif choice == "6":
                 print(" Low Stock Alerts - Coming Soon...")
             elif choice == "7":
