@@ -91,36 +91,84 @@ class MedicineManagementLib:
             print(f"Error adding medicine: {e}")
 
     @staticmethod
+
     def update_medicine():
         try:
             print("\n" + "="*60)
             print("UPDATE MEDICINE".center(60))
             print("="*60)
+            
             search_id = InputValidator.get_validated_input("Enter Medicine ID to update", MedicineValidator.validate_medicine_id)
             if search_id is None: return
+
             medicine = MedicineManagementLib.dao_service.find_by_medicine_id(search_id)
             if not medicine:
                 print("Medicine not found"); return
+
             print("\nCurrent Medicine Details:")
             print(medicine)
             if medicine.is_expired():
                 print("[!] Medicine is expired.")
             if medicine.is_critical_stock():
                 print("[!] Medicine is at critical stock level.")
+
             if not InputValidator.confirm_action("Update this medicine?"):
                 print("Update cancelled."); return
+
+            # Update medicine name
             new_name = InputValidator.get_validated_input("New name (Enter to keep current)", lambda x: (True, "") if x == "" else MedicineValidator.validate_medicine_name(x))
             if new_name: medicine.set_medicine_name(new_name)
+
+            # Update medicine type
             update_type = input("Change medicine type? (y/n): ").strip().lower()
             if update_type == 'y':
                 new_type = InputValidator.get_medicine_type_choice()
                 if new_type: medicine.set_medicine_type(new_type)
+
+            # Update unit price
             new_price = InputValidator.get_validated_input("New unit price (Enter to keep current)", lambda x: (True, "", None) if x == "" else MedicineValidator.validate_price(x))
             if new_price: medicine.set_unit_price(new_price)
+
+            # UPDATE STOCK/QUANTITY - NEW FEATURE
+            update_stock = input("Update stock quantity? (y/n): ").strip().lower()
+            if update_stock == 'y':
+                current_stock = medicine.get_quantity_in_stock()
+                print(f"Current stock: {current_stock}")
+                
+                stock_action = input("Choose: (1) Set new stock (2) Add to stock (3) Reduce stock: ").strip()
+                
+                if stock_action == "1":
+                    # Set new stock
+                    new_stock = InputValidator.get_validated_input("Enter new stock quantity", MedicineValidator.validate_quantity)
+                    if new_stock is not None: 
+                        medicine.set_quantity_in_stock(new_stock)
+                        print(f"Stock updated from {current_stock} to {new_stock}")
+                
+                elif stock_action == "2":
+                    # Add to stock
+                    add_qty = InputValidator.get_validated_input("Enter quantity to add", MedicineValidator.validate_quantity)
+                    if add_qty is not None:
+                        new_total = current_stock + add_qty
+                        medicine.set_quantity_in_stock(new_total)
+                        print(f"Added {add_qty} units. Stock updated from {current_stock} to {new_total}")
+                
+                elif stock_action == "3":
+                    # Reduce stock
+                    reduce_qty = InputValidator.get_validated_input("Enter quantity to reduce", MedicineValidator.validate_quantity)
+                    if reduce_qty is not None:
+                        if reduce_qty <= current_stock:
+                            new_total = current_stock - reduce_qty
+                            medicine.set_quantity_in_stock(new_total)
+                            print(f"Reduced {reduce_qty} units. Stock updated from {current_stock} to {new_total}")
+                        else:
+                            print("Cannot reduce more than current stock!")
+
             print("Updated medicine details:")
             print(medicine)
+
             if not InputValidator.confirm_action("Save these changes?"):
                 print("Update cancelled."); return
+
             if MedicineManagementLib.dao_service.update_medicine(medicine, search_id):
                 print("Medicine updated successfully.")
                 updated = MedicineManagementLib.dao_service.find_by_medicine_id(search_id)
@@ -128,8 +176,10 @@ class MedicineManagementLib:
                     print("Warning: Medicine now at critical stock level.")
             else:
                 print("Failed to update medicine.")
+
         except Exception as e:
             print(f"Error updating medicine: {e}")
+
 
     @staticmethod
     def disable_medicine():

@@ -13,8 +13,9 @@ class MedicineDaoImp(MedecineDaoService):
         "batch_number, quantity_in_stock, unit_price, expiry_date, minimum_stock_level) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
     )
     UPDATE_MEDICINE = (
-        "UPDATE medicine_inventory SET medicine_name = %s, medicine_type = %s, unit_price = %s WHERE medicine_id = %s"
-    )
+    "UPDATE medicine_inventory SET medicine_name = %s, medicine_type = %s, unit_price = %s, quantity_in_stock = %s WHERE medicine_id = %s")
+
+
     DISABLE_MEDICINE = (
         "UPDATE medicine_inventory SET is_active = '0' WHERE medicine_id = %s"
     )
@@ -83,9 +84,11 @@ class MedicineDaoImp(MedecineDaoService):
                 medicine.get_medicine_name(),
                 medicine.get_medicine_type(),
                 medicine.get_unit_price(),
+                medicine.get_quantity_in_stock(),  # ADD THIS LINE
                 medicine_id))
             self.conn.commit()
             return cursor.rowcount == 1
+
         except Exception as e:
             print(f"Error updating medicine: {e}")
             if self.conn:
@@ -94,6 +97,8 @@ class MedicineDaoImp(MedecineDaoService):
         finally:
             if cursor:
                 cursor.close()
+
+
 
     def disable_medicine(self, medicine_id: int) -> bool:
         cursor = None

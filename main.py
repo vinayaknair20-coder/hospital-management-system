@@ -238,11 +238,16 @@ def pharmacist_menu():
         print("3. Update Medicine")
         print("4. Disable Medicine")
         print("5. Search Medicine By ID")
-        # print("6. Search Medicines By Type")
-        print("6. Stock Alerts")
-        print("7. Medicine Statistics")
-        print("8. Go To Main Menu")
-        choice = input("Enter your choice (1-9): ").strip()
+        print("6. Search Medicines By Type")
+        print("7. Stock Alerts")
+        print("8. Medicine Statistics")
+        print("9. View Pending Prescriptions")
+        print("10. Dispense Medicines")
+        print("11. View Bills")
+        print("12. Go To Main Menu")
+        
+        choice = input("Enter your choice (1-12): ").strip()
+        
         try:
             if choice == "1":
                 MedicineManagementLib.insert_medicine()
@@ -254,18 +259,28 @@ def pharmacist_menu():
                 MedicineManagementLib.disable_medicine()
             elif choice == "5":
                 MedicineManagementLib.search_by_medicine_id()
-            # elif choice == "6":
-            #     MedicineManagementLib.search_by_medicine_type()
             elif choice == "6":
-                MedicineManagementLib.show_stock_alerts()
+                MedicineManagementLib.search_by_medicine_type()
             elif choice == "7":
-                MedicineManagementLib.show_medicine_statistics()
+                MedicineManagementLib.show_stock_alerts()
             elif choice == "8":
+                MedicineManagementLib.show_medicine_statistics()
+            elif choice == "9":
+                from lib.pharmacydispenselib import PharmacyDispenseService
+                PharmacyDispenseService.view_pending_prescriptions()
+            elif choice == "10":
+                from lib.pharmacydispenselib import PharmacyDispenseService
+                PharmacyDispenseService.dispense_and_bill()
+            elif choice == "11":
+                from lib.pharmacydispenselib import PharmacyDispenseService
+                PharmacyDispenseService.print_bill()
+            elif choice == "12":
                 break
             else:
-                print("Invalid choice. Please enter a number between 1-9.")
+                print("Invalid choice. Please enter a number between 1-12.")
         except Exception as e:
-            print("Error in pharmacy services:",e)
+            print(f"Error in pharmacy services: {e}")
+
 
 
 
