@@ -27,11 +27,16 @@ class Implementation(abstractdao):
             cursor.execute(self.view_appointments,(doc_id))
             rows=cursor.fetchall()
             for row in rows:
-                appointments.append(Appointments(appointment_id=row['appointment_id'],
-                                                patient_id=row['patient_id'],
-                                                patient_name=row['patient_name'],
-                                                doctor_id=row['doctor_id'],
-                                                token_number=row['token_number']))
+                appointments.append(Appointments(
+                    appointment_id=row["appointment_id"],
+                    patient_id=row["patient_id"],
+                    patient_name=row["patient_name"],
+                    doctor_id=row["doctor_id"],
+                    appointment_date=row["appointment_date"],
+                    token_number=row["token_number"],
+                    specialization_id=row["specialization_id"],
+                    status=row["status"]
+                ))
                 
         except Exception as e:
             print('error while displaying appointments ',e)
