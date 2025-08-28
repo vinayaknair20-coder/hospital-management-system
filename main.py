@@ -217,6 +217,12 @@ def pharmacist_menu():
         elif choice == "2":
             MedicineManagementLib.display_medicine()
         elif choice == "3":
+            MedicineManagementLib.update_medicine()
+        elif choice == "4":
+            MedicineManagementLib.disable_medicine()
+        elif choice == "5":
+            MedicineManagementLib.search_by_medicine_id()
+        elif choice == "6":
             break
         else:
             print("❌ Invalid choice! Please enter 1-3.")
