@@ -12,6 +12,8 @@ from lib.stafflibrary import StaffLibrary
 from lib.labtechmanagementlib import LabtechManagementLib
 from lib.PatientManagementLib import ReceptionistServices
 from lib.doc_managementlib import DoctorServices
+from lib.Doctorlibrary import DoctorLibrary
+from dao.doctorDao import DoctorDao
 # Uncomment these when ready:
 # from lib.PatientManagementLib import ReceptionistServices
 # from lib.menudriven import DoctorServices
@@ -20,7 +22,7 @@ class AdminMenu:
     def __init__(self):
         self.stafflib = StaffLibrary()
         self.admin_lib = AdminLibrary()
-        # self.doctorlib = DoctorLibrary()  # Uncomment when implemented
+        self.doctorlib = DoctorLibrary()  # Uncomment when implemented
 
     def show_menu(self):
         while True:
@@ -74,14 +76,25 @@ class AdminMenu:
             print("2. Update Doctor Profile")
             print("3. Deactivate Doctor")
             print("4. List Doctors")
-            print("5. Back")
+            print("5. Search doctor by id")
+            print("6. Back")
+
             choice = input("Enter your choice: ")
-            if choice in ["1", "2", "3", "4"]:
-                print("🚧 Doctor management not implemented yet.")
+
+            if choice == "1":
+                self.doctorlib.add_doctor()
+            elif choice == "2":
+                self.doctorlib.update_doctor()
+            elif choice == "3":
+                self.doctorlib.deactivate_doctor()
+            elif choice == "4":
+                self.doctorlib.list_doctors()
             elif choice == "5":
+                self.doctorlib.search_doctor_by_id()       
+            elif choice == "6":
                 break
             else:
-                print("Invalid choice!")
+                print("Invalid choice!")
 
     def role_management_menu(self):
         while True:

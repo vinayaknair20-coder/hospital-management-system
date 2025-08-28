@@ -6,7 +6,7 @@ from db.db_connection import DBConnection
 
 
 class DoctorDao:
-    def __init__(self, host="localhost", database="", user="root", password=""):
+    def __init__(self, host="localhost", database="hospital_db", user="root", password="faith"):
         self.host = host
         self.database = database
         self.user = user
@@ -81,7 +81,7 @@ class DoctorDao:
 
     def list_doctors(self):
         """Return list of all doctors"""
-        query = "SELECT * FROM doctors"
+        query = "SELECT * FROM doctors WHERE is_available = '1'"
         conn = self.connect()
         cursor = conn.cursor(dictionary=True)
         cursor.execute(query)
