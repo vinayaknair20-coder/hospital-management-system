@@ -1,9 +1,3 @@
-"""
-Unified Clinic Management System
-Main entry point for all clinic operations
-Team: Hospital Management System Development Team
-"""
-
 from db.db_connection import DBConnection
 from lib.Pharmacistservices import MedicineManagementLib
 from dao.staff_dao import StaffDao
@@ -129,7 +123,6 @@ class AdminMenu:
                 print("Invalid choice!")
 
 def test_database_connection():
-    """Test database connection at startup"""
     try:
         conn = DBConnection().get_connection()
         print("✅ Database connected successfully!")
