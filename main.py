@@ -36,10 +36,10 @@ def pharmacist_menu():
         print("3. Update Medicine")
         print("4. Disable Medicine")
         print("5. Search Medicine By ID")
-        print("6. Search Medicines By Type")
-        print("7. Stock Alerts")
-        print("8. Medicine Statistics")
-        print("9. Go To Main Menu")
+        # print("6. Search Medicines By Type")
+        print("6. Stock Alerts")
+        print("7. Medicine Statistics")
+        print("8. Go To Main Menu")
         choice = input("Enter your choice (1-9): ").strip()
         try:
             if choice == "1":
@@ -52,13 +52,13 @@ def pharmacist_menu():
                 MedicineManagementLib.disable_medicine()
             elif choice == "5":
                 MedicineManagementLib.search_by_medicine_id()
+            # elif choice == "6":
+            #     MedicineManagementLib.search_by_medicine_type()
             elif choice == "6":
-                MedicineManagementLib.search_by_medicine_type()
-            elif choice == "7":
                 MedicineManagementLib.show_stock_alerts()
-            elif choice == "8":
+            elif choice == "7":
                 MedicineManagementLib.show_medicine_statistics()
-            elif choice == "9":
+            elif choice == "8":
                 break
             else:
                 print("Invalid choice. Please enter a number between 1-9.")

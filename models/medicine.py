@@ -100,13 +100,10 @@ class Medicine:
     def get_batch_number(self):
         return self.__batch_number
 
-    def set_batch_number(self, b):
-        # Convert to string and validate
-        b_str = str(b) if b is not None else ""
-        is_valid, msg = MedicineValidator.validate_batch_number(b_str)
-        if not is_valid:
-            raise ValueError(msg)
-        self.__batch_number = b_str.strip().upper()
+    def set_batch_number(self,batch_number):
+    # More lenient validation - just convert to string
+        self.__batch_number = str(batch_number)
+
 
     def get_quantity_in_stock(self):
         return self.__quantity_in_stock
