@@ -3,7 +3,7 @@ class LabTech:
         self,
         test_id=None,
         test_name=None,
-        test_category=None,
+        test_category=None,         
         normal_range_min=None,
         normal_range_max=None,
         unit_of_measurement=None,
