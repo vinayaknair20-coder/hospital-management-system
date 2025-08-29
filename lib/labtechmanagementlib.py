@@ -9,7 +9,7 @@ class LabtechManagementLib:
     def display_all():
         products = LabtechManagementLib.dao_service.display_test()
         for product in products:
-            print(product)   # ✅ print each product
+            print(product)   # print each product
 
     @staticmethod
     def create_test():

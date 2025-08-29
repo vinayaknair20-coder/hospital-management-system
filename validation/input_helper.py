@@ -23,19 +23,19 @@ class InputHelper:
                         return result[2] if result[2] is not None else user_input
                     return user_input
                 else:
-                    print(f"❌ Error: {result[1]}")
+                    print(f"Error: {result[1]}")
                     attempts += 1
                     if attempts < max_attempts:
                         print(f"Please try again ({max_attempts - attempts} attempts remaining)")
             
             except KeyboardInterrupt:
-                print("\n❌ Operation cancelled by user")
+                print("\nOperation cancelled by user")
                 return None
             except Exception as e:
-                print(f"❌ Unexpected error: {e}")
+                print(f"Unexpected error: {e}")
                 attempts += 1
         
-        print(f"❌ Maximum attempts ({max_attempts}) reached. Operation cancelled.")
+        print(f"Maximum attempts ({max_attempts}) reached. Operation cancelled.")
         return None
     
     @staticmethod

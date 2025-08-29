@@ -125,10 +125,10 @@ class AdminMenu:
 def test_database_connection():
     try:
         conn = DBConnection().get_connection()
-        print("✅ Database connected successfully!")
+        print(" Database connected successfully!")
         return True
     except Exception as e:
-        print(f"❌ Database connection failed: {e}")
+        print(f" Database connection failed: {e}")
         return False
 
 def receptionist_menu():
@@ -199,11 +199,11 @@ def patient_management_menu():
         print("5. BACK TO RECEPTIONIST MENU")
         choice = input("Enter your choice: ").strip()
         if choice in ["1", "2", "3", "4"]:
-            print("🚧 Patient management not implemented yet.")
+            print(" Patient management not implemented yet.")
         elif choice == "5":
             break
         else:
-            print("❌ Invalid choice! Please enter 1-5.")
+            print(" Invalid choice! Please enter 1-5.")
 
 
 def doctor_menu():
@@ -325,21 +325,21 @@ def login():
         password = input("Enter Password: ")
         user = AdminLibrary.authenticate_user(email, password)
         if not user:
-            print("❌ Invalid Username(email) or Password")
+            print(" Invalid Username(email) or Password")
             return None
         if not user.get("is_active", True):
-            print("❌ Account is deactivated. Contact Admin.")
+            print(" Account is deactivated. Contact Admin.")
             return None
-        print(f"✅ Login successful! Welcome {user['staff_name']} ({user['role_name']})")
+        print(f" Login successful! Welcome {user['staff_name']} ({user['role_name']})")
         return user
     except Exception as e:
-        print(f"❌ Login error: {e}")
+        print(f" Login error: {e}")
         return None
 
 def main():
     display_welcome_banner()
     if not test_database_connection():
-        print("❌ Cannot start application without database connection")
+        print(" Cannot start application without database connection")
         return
     while True:
         print("\n======= CLINIC MANAGEMENT SYSTEM ==========")
@@ -353,7 +353,7 @@ def main():
                 if role == "admin":
                     AdminMenu().show_menu()
                 elif role == "receptionist":
-                    receptionist_menu()
+                    ReceptionistServices.receptionist_main_menu()
                 elif role == "doctor":
                     doctor_menu()
                 elif role == "pharmacist":
@@ -361,12 +361,12 @@ def main():
                 elif role == "lab tech":
                     lab_technician()
                 else:
-                    print(f"❌ Role '{role}' not recognized.")
+                    print(f" Role '{role}' not recognized.")
         elif choice == "2":
-            print("👋 Exiting... Goodbye!")
+            print(" Exiting... Goodbye!")
             break
         else:
-            print("❌ Invalid choice. Try again.")
+            print(" Invalid choice. Try again.")
 
 if __name__ == "__main__":
     main()

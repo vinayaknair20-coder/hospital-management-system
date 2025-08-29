@@ -347,69 +347,87 @@ class ReceptionistServices:
         try:
             appointment_id = int(input("Enter Appointment ID: "))
 
-            # Step 1: Fetch appointment details
-            appointment = ReceptionistServices.dao_services.search_appointment_by_patient_id(appointment_id)
-            if not appointment:
+            # Step 1: Check if bill already exists
+            if ReceptionistServices.dao_services.check_bill_exists(appointment_id):
+                print("A bill already exists for this appointment!")
+                print("Each appointment can only have one bill.")
+                return
+            
+            # Step 2: Fetch appointment details with consultation fee
+            appointment_details = ReceptionistServices.dao_services.get_appointment_details_for_billing(appointment_id)
+            if not appointment_details:
                 print("Appointment not found! Please check the ID.")
                 return
-            patient_id = appointment.patient_id
-            patient_name = appointment.patient_name
-            doctor_id = appointment.doctor_id
+            
+            patient_id = appointment_details['patient_id']
+            patient_name = appointment_details['patient_name']
+            doctor_id = appointment_details['doctor_id']
+            consultation_fee = appointment_details['consultation_fee']
 
-            # Step 2: Fetch doctor consultation fee
-            doctors = ReceptionistServices.dao_services.get_doctors()
-            consultation_fee = None
-            for doc in doctors:
-                if doc[0] == doctor_id:
-                    consultation_fee = doc[3]  # consultation_fee
-                    break
-
-            if consultation_fee is None:
-                print("Doctor not found! Cannot fetch consultation fee.")
-                return
-
-            # Step 3: Display details
-            print("\nAppointment Details:")
+            # Step 2: Display appointment details
+            print("\n" + "="*50)
+            print("APPOINTMENT DETAILS FOR BILLING")
+            print("="*50)
+            print(f"Appointment ID     : {appointment_id}")
             print(f"Patient ID         : {patient_id}")
             print(f"Patient Name       : {patient_name}")
             print(f"Doctor ID          : {doctor_id}")
-            print(f"Consultation Fee   : {consultation_fee}")
+            print(f"Consultation Fee   : ₹{consultation_fee}")
+            print("="*50)
 
-            # Step 4: Choose payment method
-            payment_methods = ["Cash", "Card", "UPI"]
-            print("Payment Methods:")
+            # Step 3: Choose payment method
+            payment_methods = ["Cash", "Card", "UPI", "Net Banking"]
+            print("\nAvailable Payment Methods:")
             for idx, method in enumerate(payment_methods, 1):
                 print(f"{idx}. {method}")
 
             while True:
                 try:
-                    choice = int(input("Choose Payment Method (1-3): "))
-                    if 1 <= choice <= 3:
+                    choice = int(input("\nChoose Payment Method (1-4): "))
+                    if 1 <= choice <= 4:
                         payment_method = payment_methods[choice - 1]
                         break
                     else:
-                        print("Invalid choice! Select 1, 2, or 3.")
+                        print("Invalid choice! Select 1, 2, 3, or 4.")
                 except ValueError:
                     print("Enter numeric choice only!")
 
-            # Step 5: Insert bill
+            # Step 4: Confirm billing
+            print(f"\nPayment Method Selected: {payment_method}")
+            confirm = input("Proceed with bill generation? (y/n): ").lower().strip()
+            
+            if confirm != 'y':
+                print("Bill generation cancelled.")
+                return
+
+            # Step 5: Create and insert bill
             bill = Billing(
                 appointment_id=appointment_id,
-                patient_id=appointment.patient_id,
+                patient_id=patient_id,
                 doctor_id=doctor_id,
                 consultation_fee=consultation_fee,
                 payment_method=payment_method,
-                payment_status="",  # will be decided in DAO
+                payment_status="COMPLETED",
                 payment_date=datetime.now()
             )
 
+            print("\nGenerating bill...")
             if ReceptionistServices.dao_services.insert_bill(bill):
-                print("Bill inserted successfully!")
+                print("Bill generated successfully!")
+                print(f"Bill Details:")
+                print(f"- Appointment ID: {appointment_id}")
+                print(f"- Patient: {patient_name}")
+                print(f"- Amount: ₹{consultation_fee}")
+                print(f"- Payment Method: {payment_method}")
+                print(f"- Status: COMPLETED")
             else:
-                print("Failed to insert bill!")
+                print("Failed to generate bill! Please try again.")
 
+        except ValueError as ve:
+            print("Invalid input! Please enter a valid appointment ID.")
         except Exception as e:
-            print("Error while adding bill:", e)
+            print(f"Error while generating bill: {e}")
+            print("Please check if the appointment exists and try again.")
 
     @staticmethod
     def show_bill():
@@ -419,10 +437,171 @@ class ReceptionistServices:
             if not bills:
                 print("No bills found for this patient.")
                 return
-            for bill in bills:
-                print(bill)
+            
+            print("\n" + "="*60)
+            print(f"BILLING HISTORY FOR PATIENT ID: {patient_id}")
+            print("="*60)
+            
+            for i, bill in enumerate(bills, 1):
+                print(f"\nBILL #{i}")
+                print("-" * 40)
+                print(f"Bill ID           : {bill.bill_id}")
+                print(f"Appointment ID    : {bill.appointment_id}")
+                print(f"Doctor ID         : {bill.doctor_id}")
+                print(f"Consultation Fee  : ₹{bill.consultation_fee}")
+                print(f"Payment Status    : {bill.payment_status}")
+                print(f"Payment Method    : {bill.payment_method}")
+                if bill.payment_date:
+                    print(f"Bill Date         : {bill.payment_date}")
+                print("-" * 40)
+            
+            print(f"\nTotal Bills Found: {len(bills)}")
+            print("="*60)
+            
+        except ValueError as ve:
+            print("Invalid input! Please enter a valid patient ID.")
         except Exception as e:
-            print("Error while viewing bills:", e)
+            print(f"Error while viewing bills: {e}")
+
+    @staticmethod
+    def display_all_bills():
+        """Display all bills for administrative purposes"""
+        try:
+            bills = ReceptionistServices.dao_services.get_all_bills()
+            if not bills:
+                print("No bills found in the system.")
+                return
+            
+            print("\n" + "="*80)
+            print("ALL BILLS IN THE SYSTEM")
+            print("="*80)
+            
+            total_revenue = 0
+            for i, bill in enumerate(bills, 1):
+                print(f"\nBILL #{i}")
+                print("-" * 50)
+                print(f"Bill ID           : {bill.bill_id}")
+                print(f"Appointment ID    : {bill.appointment_id}")
+                print(f"Patient ID        : {bill.patient_id}")
+                print(f"Doctor ID         : {bill.doctor_id}")
+                print(f"Consultation Fee  : ₹{bill.consultation_fee}")
+                print(f"Payment Status    : {bill.payment_status}")
+                print(f"Payment Method    : {bill.payment_method}")
+                if bill.payment_date:
+                    print(f"Bill Date         : {bill.payment_date}")
+                print("-" * 50)
+                total_revenue += bill.consultation_fee
+            
+            print(f"\nSUMMARY")
+            print(f"Total Bills       : {len(bills)}")
+            print(f"Total Revenue     : ₹{total_revenue}")
+            print("="*80)
+            
+        except Exception as e:
+            print(f"Error while displaying all bills: {e}")
+
+    @staticmethod
+    def receptionist_main_menu():
+        """Main receptionist menu with all services"""
+        while True:
+            print("\n========== Welcome to Receptionist Dashboard ==========")
+            print("============== SERVICES ================")
+            print("1. PATIENT")
+            print("2. APPOINTMENTS")
+            print("3. BILLING")
+            print("4. EXIT")
+            
+            choice = input("Enter your choice: ").strip()
+            
+            if choice == "1":
+                ReceptionistServices.patient_menu()
+            elif choice == "2":
+                ReceptionistServices.appointment_menu()
+            elif choice == "3":
+                ReceptionistServices.billing_menu()
+            elif choice == "4":
+                print("Logging out from Receptionist Dashboard...")
+                break
+            else:
+                print("Invalid choice! Please select 1, 2, 3, or 4.")
+
+    @staticmethod
+    def patient_menu():
+        """Patient management submenu"""
+        while True:
+            print("\n--- PATIENT MANAGEMENT ---")
+            print("1. Add Patient")
+            print("2. Display All Patients")
+            print("3. Update Patient")
+            print("4. Search Patient")
+            print("5. Back to Main Menu")
+            
+            choice = input("Enter your choice: ").strip()
+            
+            if choice == "1":
+                ReceptionistServices.add_patients()
+            elif choice == "2":
+                ReceptionistServices.display_all()
+            elif choice == "3":
+                ReceptionistServices.update_patient()
+            elif choice == "4":
+                ReceptionistServices.search_patient()
+            elif choice == "5":
+                break
+            else:
+                print("Invalid choice! Please select 1-5.")
+
+    @staticmethod
+    def appointment_menu():
+        """Appointment management submenu"""
+        while True:
+            print("\n--- APPOINTMENT MANAGEMENT ---")
+            print("1. Book Appointment")
+            print("2. Display All Appointments")
+            print("3. Cancel Appointment")
+            print("4. Reschedule Appointment")
+            print("5. Search Appointments by Patient ID")
+            print("6. Back to Main Menu")
+            
+            choice = input("Enter your choice: ").strip()
+            
+            if choice == "1":
+                ReceptionistServices.book_appointment()
+            elif choice == "2":
+                ReceptionistServices.display_all_appointments()
+            elif choice == "3":
+                ReceptionistServices.cancel_appointment()
+            elif choice == "4":
+                ReceptionistServices.reschedule_appointment()
+            elif choice == "5":
+                ReceptionistServices.search_appointment()
+            elif choice == "6":
+                break
+            else:
+                print("Invalid choice! Please select 1-6.")
+
+    @staticmethod
+    def billing_menu():
+        """Billing management submenu"""
+        while True:
+            print("\n--- BILLING MANAGEMENT ---")
+            print("1. Generate Bill")
+            print("2. View Bill by Patient ID")
+            print("3. View All Bills")
+            print("4. Back to Main Menu")
+            
+            choice = input("Enter your choice: ").strip()
+            
+            if choice == "1":
+                ReceptionistServices.add_bill()
+            elif choice == "2":
+                ReceptionistServices.show_bill()
+            elif choice == "3":
+                ReceptionistServices.display_all_bills()
+            elif choice == "4":
+                break
+            else:
+                print("Invalid choice! Please select 1-4.")
 
 
             

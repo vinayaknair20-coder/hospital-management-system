@@ -17,9 +17,9 @@ class StaffDao:
             password_hash = hashlib.sha256(password.encode()).hexdigest()
             cursor.execute(sql, (staff_id, staff_name, role_id, age, phone_number, email, doj, password_hash))
             conn.commit()
-            print("✅ Staff added successfully!")
+            print("Staff added successfully!")
         except Exception as e:
-            print(f"❌ Error while adding staff: {e}")
+            print(f"Error while adding staff: {e}")
         finally:
             if cursor:
                 cursor.close()
@@ -34,9 +34,9 @@ class StaffDao:
             sql = "UPDATE staff SET phone_number=%s, email=%s WHERE staff_id=%s"
             cursor.execute(sql, (phone_number, email, staff_id))
             conn.commit()
-            print("✅ Staff updated successfully.")
+            print("Staff updated successfully.")
         except Exception as e:
-            print("❌ Error updating staff:", e)
+            print("Error updating staff:", e)
         finally:
             if cursor:
                 cursor.close()
@@ -51,9 +51,9 @@ class StaffDao:
             sql = "UPDATE staff SET is_active=FALSE WHERE staff_id=%s"
             cursor.execute(sql, (staff_id,))
             conn.commit()
-            print("✅ Staff deactivated successfully.")
+            print("Staff deactivated successfully.")
         except Exception as e:
-            print("❌ Error deactivating staff:", e)
+            print("Error deactivating staff:", e)
         finally:
             if cursor:
                 cursor.close()
@@ -70,7 +70,7 @@ class StaffDao:
             result = cursor.fetchall()
             return result
         except Exception as e:
-            print("❌ Error listing staff:", e)
+            print("Error listing staff:", e)
             return []
         finally:
             if cursor:
@@ -92,7 +92,7 @@ class StaffDao:
             else:
                 return "1001"
         except Exception as e:
-            print("❌ Error generating staff_id:", e)
+            print("Error generating staff_id:", e)
             return "1001"
         finally:
             if cursor:

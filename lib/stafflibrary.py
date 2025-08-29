@@ -29,9 +29,9 @@ class StaffLibrary:
             )
             
         except ValueError as ve:
-            print(f"❌ Validation Error: {ve}")
+            print(f"Validation Error: {ve}")
         except Exception as e:
-            print(f"❌ Unexpected Error: {e}")
+            print(f"Unexpected Error: {e}")
 
     def update_staff(self):
         staff_id = input("Enter Staff ID to update: ")
@@ -46,7 +46,7 @@ class StaffLibrary:
     def list_staff(self):
         staff_list = self.dao.list_staff()
         if not staff_list:
-            print("⚠ No staff found.")
+            print("No staff found.")
         else:
             print("\n--- Staff ---")
             for s in staff_list:

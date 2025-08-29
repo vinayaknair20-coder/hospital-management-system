@@ -14,9 +14,9 @@ class AdminDao:
             sql = "INSERT INTO roles (role_id, role_name, description) VALUES (%s, %s, %s)"
             cursor.execute(sql, (role_id, role_name, description))
             self.conn.commit()
-            print("✅ Role created successfully!")
+            print("Role created successfully!")
         except Exception as e:
-            print(f"❌ Error creating role: {e}")
+            print(f"Error creating role: {e}")
         finally:
             if cursor:
                 cursor.close()
@@ -32,7 +32,7 @@ class AdminDao:
             cursor.execute(sql)
             return cursor.fetchall()
         except Exception as e:
-            print("❌ Error listing roles:", e)
+            print("Error listing roles:", e)
             return []
         finally:
             if cursor:
@@ -48,9 +48,9 @@ class AdminDao:
             sql = "INSERT INTO specializations (specialization_id, specialization_name, description) VALUES (%s, %s, %s)"
             cursor.execute(sql, (specialization_id, specialization_name, description))
             self.conn.commit()
-            print("✅ Specialization created successfully!")
+            print("Specialization created successfully!")
         except Exception as e:
-            print(f"❌ Error creating specialization: {e}")
+            print(f"Error creating specialization: {e}")
         finally:
             if cursor:
                 cursor.close()
@@ -66,7 +66,7 @@ class AdminDao:
             cursor.execute(sql)
             return cursor.fetchall()
         except Exception as e:
-            print("❌ Error listing specialization:", e)
+            print("Error listing specialization:", e)
             return []
         finally:
             if cursor:

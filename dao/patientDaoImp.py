@@ -17,14 +17,41 @@ class PatientDaoImplementation(PatientDaoService):
     CANCEL_APPOINTMENT = "UPDATE appointments SET status='CANCELLED' WHERE appointment_id=%s"
     RESCHEDULE_APPOINTMENT = "UPDATE appointments SET appointment_date=%s WHERE appointment_id=%s"
     SEARCH_APPOINTMENT_BY_PATIENT_ID = "SELECT * FROM appointments WHERE patient_id=%s"
-    INSERT_BILL = "INSERT INTO receptionist_billing (patient_id, appointment_id, doctor_id, consultation_fee, payment_status, payment_method, payment_date) VALUES(%s,%s,%s,%s,%s,%s,%s)"
-    VIEW_BILL = "SELECT bill_id, patient_id, appointment_id, doctor_id, consultation_fee, payment_status, payment_method, payment_date FROM receptionist_billing WHERE patient_id=%s"
+    INSERT_BILL = "INSERT INTO receptionist_billing (patient_id, appointment_id, doctor_id, consultation_fee, payment_status, payment_method) VALUES(%s,%s,%s,%s,%s,%s)"
+    VIEW_BILL = "SELECT bill_id, patient_id, appointment_id, doctor_id, consultation_fee, payment_status, payment_method FROM receptionist_billing WHERE patient_id=%s"
 
 
 
 
     def __init__(self):
-        self.conn = DBConnection().get_connection() 
+        self.conn = DBConnection().get_connection()
+        self.create_billing_table_if_not_exists()
+    
+    def create_billing_table_if_not_exists(self):
+        """Create the receptionist_billing table if it doesn't exist"""
+        try:
+            cursor = self.conn.cursor()
+            create_table_sql = """
+            CREATE TABLE IF NOT EXISTS receptionist_billing (
+                bill_id INT AUTO_INCREMENT PRIMARY KEY,
+                patient_id INT NOT NULL,
+                appointment_id INT NOT NULL,
+                doctor_id INT NOT NULL,
+                consultation_fee DECIMAL(10,2) NOT NULL,
+                payment_status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+                payment_method VARCHAR(20) NOT NULL,
+                FOREIGN KEY (patient_id) REFERENCES patients(patient_id),
+                FOREIGN KEY (appointment_id) REFERENCES appointments(appointment_id),
+                FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id)
+            )
+            """
+            cursor.execute(create_table_sql)
+            self.conn.commit()
+            print("DEBUG: Billing table checked/created successfully")
+        except Exception as e:
+            print(f"DEBUG: Error creating billing table: {e}")
+        finally:
+            cursor.close() 
 
     def insert_patients(self,patient:Patient)->bool:
         try:
@@ -316,42 +343,45 @@ class PatientDaoImplementation(PatientDaoService):
         try:
             cursor = self.conn.cursor(DictCursor)
 
+            print(f"DEBUG: Attempting to insert bill for appointment ID: {bill.appointment_id}")
+
             # Step 1: Fetch patient_id and doctor_id from appointments
             cursor.execute("SELECT patient_id, doctor_id FROM appointments WHERE appointment_id = %s",
                         (bill.appointment_id,))
             appointment = cursor.fetchone()
             if not appointment:
-                print("Invalid Appointment ID!")
+                print("DEBUG: No appointment found with ID:", bill.appointment_id)
                 return False
+            
             patient_id = appointment['patient_id']  # Correct - access dict keys
             doctor_id = appointment['doctor_id']
+            print(f"DEBUG: Found appointment - Patient ID: {patient_id}, Doctor ID: {doctor_id}")
 
-            # Step 2: Fetch consultation fee from doctors table
-            cursor.execute("SELECT consultation_fee FROM doctors WHERE doctor_id = %s", (doctor_id,))
-            doc = cursor.fetchone()
-            if not doc:
-                print("Doctor not found!")
-                return False
-            consultation_fee = doc['consultation_fee']  # Correct - accessing dict key
+            # Step 2: Set payment status automatically (use the consultation_fee from the bill object)
+            payment_status = "COMPLETED"  # Since we're generating the bill, payment is completed
+            print(f"DEBUG: Payment status set to: {payment_status}")
 
-            # Step 3: Set payment status automatically
-            payment_status = "COMPLETED" if bill.consultation_fee >= consultation_fee else "PENDING"
-
-            # Step 4: Insert into billing table
+            # Step 3: Insert into billing table
+            print(f"DEBUG: Inserting bill with params: {patient_id}, {bill.appointment_id}, {doctor_id}, {bill.consultation_fee}, {payment_status}, {bill.payment_method}")
+            
             cursor.execute(self.INSERT_BILL, (
                 patient_id,
                 bill.appointment_id,
                 doctor_id,
-                consultation_fee,
+                bill.consultation_fee,  # Use the consultation_fee from the bill object
                 payment_status,
-                bill.payment_method,
-                bill.payment_date
+                bill.payment_method
             ))
+            
+            rows_affected = cursor.rowcount
+            print(f"DEBUG: Rows affected by INSERT: {rows_affected}")
+            
             self.conn.commit()
-            return cursor.rowcount == 1
+            return rows_affected == 1
 
         except Exception as e:
             print("Error adding bill:", e)
+            print(f"DEBUG: Exception type: {type(e).__name__}")
             return False
         finally:
             cursor.close()
@@ -371,9 +401,74 @@ class PatientDaoImplementation(PatientDaoService):
                                      consultation_fee=row["consultation_fee"],
                                      payment_status=row["payment_status"],
                                      payment_method=row["payment_method"],
-                                     payment_date=row["payment_date"]))
+                                     payment_date=None))  # Set to None since created_date column doesn't exist
         except Exception as e:
             print("Error fetching bills:", e)
+        finally:
+            cursor.close()
+        return bills
+    
+    def get_appointment_details_for_billing(self, appointment_id: int):
+        """Get appointment details with patient and doctor information for billing"""
+        try:
+            cursor = self.conn.cursor(DictCursor)
+            query = """
+            SELECT a.appointment_id, a.patient_id, a.patient_name, a.doctor_id, 
+                   d.consultation_fee, d.staff_id
+            FROM appointments a
+            JOIN doctors d ON a.doctor_id = d.doctor_id
+            WHERE a.appointment_id = %s
+            """
+            cursor.execute(query, (appointment_id,))
+            result = cursor.fetchone()
+            return result
+        except Exception as e:
+            print(f"Error fetching appointment details for billing: {e}")
+            return None
+        finally:
+            cursor.close()
+    
+    def check_bill_exists(self, appointment_id: int) -> bool:
+        """Check if a bill already exists for the given appointment"""
+        try:
+            cursor = self.conn.cursor(DictCursor)
+            query = "SELECT COUNT(*) as count FROM receptionist_billing WHERE appointment_id = %s"
+            cursor.execute(query, (appointment_id,))
+            result = cursor.fetchone()
+            return result['count'] > 0
+        except Exception as e:
+            print(f"Error checking if bill exists: {e}")
+            return False
+        finally:
+            cursor.close()
+    
+    def get_all_bills(self) -> List[Billing]:
+        """Get all bills for administrative purposes"""
+        bills = []
+        try:
+            cursor = self.conn.cursor(DictCursor)
+            query = """
+            SELECT b.*, p.patient_name, d.staff_id
+            FROM receptionist_billing b
+            JOIN patients p ON b.patient_id = p.patient_id
+            JOIN doctors d ON b.doctor_id = d.doctor_id
+            ORDER BY b.bill_id DESC
+            """
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            for row in rows:
+                bills.append(Billing(
+                    bill_id=row["bill_id"],
+                    patient_id=row["patient_id"],
+                    appointment_id=row["appointment_id"],
+                    doctor_id=row["doctor_id"],
+                    consultation_fee=row["consultation_fee"],
+                    payment_status=row["payment_status"],
+                    payment_method=row["payment_method"],
+                    payment_date=None
+                ))
+        except Exception as e:
+            print(f"Error fetching all bills: {e}")
         finally:
             cursor.close()
         return bills

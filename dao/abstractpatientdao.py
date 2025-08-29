@@ -47,13 +47,29 @@ class PatientDaoService(ABC):
     @abstractmethod
     def search_appointment_by_patient_id(self, patient_id: int):
         pass
+    
+    @abstractmethod
+    def search_appointment_by_id(self, appointment_id: int):
+        pass
     #-------------------------------------
     @abstractmethod
     def insert_bill(self, bills:Billing)->bool:
         pass
 
     @abstractmethod
-    def view_bill(self) -> List[Billing]:
+    def view_bill(self, patient_id: int) -> List[Billing]:
+        pass
+    
+    @abstractmethod
+    def get_appointment_details_for_billing(self, appointment_id: int):
+        pass
+    
+    @abstractmethod
+    def check_bill_exists(self, appointment_id: int) -> bool:
+        pass
+    
+    @abstractmethod
+    def get_all_bills(self) -> List[Billing]:
         pass
 
   

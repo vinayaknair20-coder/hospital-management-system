@@ -43,7 +43,7 @@ class AdminLibrary:
                 }
             return None
         except Exception as e:
-            print(f"❌ Error in authentication: {e}")
+            print(f"Error in authentication: {e}")
             return None
         finally:
             if cursor:
@@ -57,34 +57,34 @@ class AdminLibrary:
 
             # Input validation
             if not role_id:
-                print("❌ Role ID cannot be empty.")
+                print("Role ID cannot be empty.")
                 return
 
             if not role_name:
-                print("❌ Role Name cannot be empty.")
+                print("Role Name cannot be empty.")
                 return
 
             # Check if role already exists
             existing_roles = self.dao.list_roles()
             for role in existing_roles:
                 if role['role_id'] == role_id:
-                    print(f"❌ Role with ID '{role_id}' already exists.")
+                    print(f"Role with ID '{role_id}' already exists.")
                     return
                 if role['role_name'].upper() == role_name.upper():
-                    print(f"❌ Role with name '{role_name}' already exists.")
+                    print(f"Role with name '{role_name}' already exists.")
                     return
 
             self.dao.create_role(role_id, role_name, description)
-            print(f"✅ Role '{role_name}' created successfully!")
+            print(f"Role '{role_name}' created successfully!")
 
         except Exception as e:
-            print(f"❌ Error creating role: {e}")
+            print(f"Error creating role: {e}")
 
     def list_roles(self):
         try:
             roles = self.dao.list_roles()
             if not roles:
-                print("⚠ No roles found.")
+                print("No roles found.")
             else:
                 print("\n" + "="*50)
                 print("               ROLES LIST")
@@ -96,7 +96,7 @@ class AdminLibrary:
                     print(f"{r['role_id']:<10} {r['role_name']:<20} {active_status:<8}")
                 print("="*50)
         except Exception as e:
-            print(f"❌ Error listing roles: {e}")
+            print(f"Error listing roles: {e}")
 
     # ---------------- SPECIALIZATION LIBRARY ----------------
 
@@ -108,39 +108,39 @@ class AdminLibrary:
 
             # Input validation
             if not specialization_id:
-                print("❌ Specialization ID cannot be empty.")
+                print("Specialization ID cannot be empty.")
                 return
 
             if not specialization_name:
-                print("❌ Specialization Name cannot be empty.")
+                print("Specialization Name cannot be empty.")
                 return
 
             # Validate ID format
             if not specialization_id.startswith('SPEC') or len(specialization_id) != 7:
-                print("❌ Specialization ID must be in format 'SPEC001' (SPEC + 3 digits).")
+                print("Specialization ID must be in format 'SPEC001' (SPEC + 3 digits).")
                 return
 
             # Check if specialization already exists
             existing_specs = self.dao.list_specialization()
             for spec in existing_specs:
                 if spec['specialization_id'].upper() == specialization_id:
-                    print(f"❌ Specialization with ID '{specialization_id}' already exists.")
+                    print(f"Specialization with ID '{specialization_id}' already exists.")
                     return
                 if spec['specialization_name'].upper() == specialization_name.upper():
-                    print(f"❌ Specialization '{specialization_name}' already exists.")
+                    print(f"Specialization '{specialization_name}' already exists.")
                     return
 
             self.dao.create_specialization(specialization_id, specialization_name, description)
-            print(f"✅ Specialization '{specialization_name}' created successfully!")
+            print(f"Specialization '{specialization_name}' created successfully!")
 
         except Exception as e:
-            print(f"❌ Error creating specialization: {e}")
+            print(f"Error creating specialization: {e}")
 
     def list_specialization(self):
         try:
             specs = self.dao.list_specialization()
             if not specs:
-                print("⚠ No specializations found.")
+                print("No specializations found.")
             else:
                 print("\n" + "="*70)
                 print("                    SPECIALIZATIONS LIST")
@@ -152,7 +152,7 @@ class AdminLibrary:
                     print(f"{s['specialization_id']:<10} {s['specialization_name']:<25} {desc:<30}")
                 print("="*70)
         except Exception as e:
-            print(f"❌ Error listing specializations: {e}")
+            print(f"Error listing specializations: {e}")
 
     # ---------------- UTILITY METHODS ----------------
 
@@ -198,4 +198,4 @@ class AdminLibrary:
             elif response in ['n', 'no']:
                 return False
             else:
-                print("❌ Please enter 'y' for yes or 'n' for no.")
+                print("Please enter 'y' for yes or 'n' for no.")
