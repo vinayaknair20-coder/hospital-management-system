@@ -12,6 +12,19 @@ from dao.doctorDao import DoctorDao
 # from lib.PatientManagementLib import ReceptionistServices
 # from lib.menudriven import DoctorServices
 
+import sys
+
+def safe_input(prompt: str = "") -> str:
+    """Flush potential buffered keypresses on Windows, then read input."""
+    if sys.platform == "win32":
+        try:
+            import msvcrt
+            while msvcrt.kbhit():
+                msvcrt.getch()
+        except Exception:
+            pass
+    return input(prompt)
+
 class AdminMenu:
     def __init__(self):
         self.stafflib = StaffLibrary()
@@ -207,36 +220,72 @@ def patient_management_menu():
 
 
 def doctor_menu():
-        while True:
-            print(" Welcome to Doctor Dashboard")
-            print('SERVICES\n1.Appointments\n2.Consultations\n3.Prescriptions\n4.Go to main menu')
-            choice=input('enter your choice:')
-            if choice=='1':
-                DoctorServices.display_appointments()
-            elif choice=='2':
-                while True:
-                    print('1.create consultation\n2.display consultation by patient id\n3.go back')
-                    option=input('enter your choice: ')
-                    if option=='1':
-                        DoctorServices.create_new_consultation()
-                    elif option=='2':
-                        DoctorServices.view_patient_consultation()
-                    elif option=='3':
-                        break
-                    else:
-                        print('invalid option')
-            elif choice=='3':
-                while True:
-                    print('SERVICES\n1.ADD PRESCRIPTION\n2.list prescriptions by appointment id')
-                    ch=input('enter choice: ')
-                    if ch =='1':
-                        DoctorServices.create_prescription()
-                    elif ch=='2':
-                        DoctorServices.view_prescription_by_app_id()
-                    else:
-                        break
-            elif choice=='4':
-                break
+    while True:
+        # clear_screen()
+        print("\n Welcome to Doctor Dashboard")
+        print("\n---SERVICES---")
+        print("1. Appointments")
+        print("2. Consultations")
+        print("3. Prescriptions")
+        print("4. Go to main menu")
+
+        choice = safe_input("Enter your choice: ").strip()
+
+        if choice == '1':
+            DoctorServices.display_appointments()
+            safe_input("\n✔ Press Enter to continue...")
+        elif choice == '2':
+            while True:
+                # clear_screen()
+                print("\n--- CONSULTATIONS ---")
+                print("1. Create consultation")
+                print("2. Display consultation by patient id")
+                print("3. Display consultations of doctor")
+                print("4. Go back")
+                opt = safe_input("\nEnter your choice: ").strip()
+                if opt == '1':
+                    DoctorServices.create_new_consultation()
+                    safe_input("\n✔ Press Enter to continue...")
+                elif opt == '2':
+                    DoctorServices.view_patient_consultation()
+                    safe_input("\n✔ Press Enter to continue...")
+                elif opt == '3':
+                    DoctorServices.view_doctors_consultation()
+                    safe_input("\n✔ Press Enter to continue...")
+                elif opt == '4':
+                    break
+                else:
+                    print("⚠ Invalid option")
+                    safe_input("\nPress Enter...")
+        elif choice == '3':
+            while True:
+                print("\n--- PRESCRIPTIONS ---")
+                print("1. Add prescription")
+                print("2. List prescriptions by patient id")
+                print("3. Go back")
+                ch = safe_input("Enter choice: ").strip()
+
+                if ch == '1':
+                    # Prescription creation menu now handles medicines/tests internally
+                    DoctorServices.create_prescription_menu()
+                    safe_input("\n✔ Press Enter to continue...")
+
+                elif ch == '2':
+                    # Display prescriptions by patient id
+                    DoctorServices.view_prescription_by_patient_id()
+                    safe_input("\n✔ Press Enter to continue...")
+
+                elif ch == '3':
+                    break
+
+                else:
+                    print("⚠ Invalid choice!!")
+                    safe_input("\nPress Enter...")
+        elif choice=='4':
+            break
+        else:
+            print('invalid choice!!')
+
 
 
 
