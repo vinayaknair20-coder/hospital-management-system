@@ -349,16 +349,36 @@ def pharmacist_menu():
 def lab_technician():
     print("Welcome to Lab_Technician Dashboard")
     while True:
-        print('services\n1.ADD TEST\n2.LIST TEST\n3.EXIT')
-        choice=input('enter choice: ')
+        print('services\n1.ADD TEST\n2.LIST TEST\n3.SEARCH TEST\n4.UPDATE TEST\n5.DELETE TEST\n6.PRESCRIPTION VIEW\n7.ADD TEST RESULT\n8.LIST TEST RESULTS\n9.BACK')
+        choice=safe_input('enter choice: ').strip()
         if choice=='1':
             LabtechManagementLib.create_test()
+            safe_input("\n✔ Press Enter to continue...")
         elif choice=='2':
             LabtechManagementLib.display_all()
+            safe_input("\n✔ Press Enter to continue...")
         elif choice=='3':
+            LabtechManagementLib.search_by_id()
+            safe_input("\n✔ Press Enter to continue...")
+        elif choice=='4':
+            LabtechManagementLib.update_test()
+            safe_input("\n✔ Press Enter to continue...")
+        elif choice=='5':
+            LabtechManagementLib.disable_product()
+            safe_input("\n✔ Press Enter to continue...")
+        elif choice=='6':
+            LabtechManagementLib.view_prescription_results()
+            safe_input("\n✔ Press Enter to continue...")
+        elif choice=='7':
+            LabtechManagementLib.add_test_result()
+            safe_input("\n✔ Press Enter to continue...")
+        elif choice=='8':
+            LabtechManagementLib.list_all_results()
+            safe_input("\n✔ Press Enter to continue...")
+        elif choice=='9':
             break
         else:
-            print("Try again")
+            print("Invalid choice")
      
 
 def display_welcome_banner():

@@ -19,11 +19,11 @@ class LabDaoimplementation(AbstractLabDao):
             test_price = %s
         WHERE test_id = %s AND is_active = 1
     """
-    DISABLE = "UPDATE lab_tests SET is_active = 0 WHERE test_id = %s"
+    DISABLE = "UPDATE lab_tests SET is_active = 0 WHERE test_id = %s AND is_active = 1 LIMIT 1"
     
     ADD_TEST_RESULT = """
-        INSERT INTO lab_results (test_prescription_id, test_value, result_status, tested_date, lab_resultcol)
-        VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO lab_results (test_prescription_id, test_value, result_status, tested_date)
+        VALUES (%s, %s, %s, %s)
     """
 
     VIEW_PRESCRIPTION_RESULTS = """
@@ -33,11 +33,23 @@ class LabDaoimplementation(AbstractLabDao):
                lr.result_id,
                lr.test_value,
                lr.result_status,
-               lr.tested_date,
-               lr.lab_resultcol
+               lr.tested_date
         FROM test_prescription tp
         LEFT JOIN lab_results lr
                ON tp.test_prescription_id = lr.test_prescription_id
+    """
+
+    LIST_ALL_RESULTS = """
+        SELECT lr.result_id,
+               lr.test_prescription_id,
+               tp.prescription_id,
+               tp.test_name,
+               lr.test_value,
+               lr.result_status,
+               lr.tested_date
+        FROM lab_results lr
+        JOIN test_prescription tp ON lr.test_prescription_id = tp.test_prescription_id
+        ORDER BY lr.tested_date DESC, lr.result_id DESC
     """
 
     def __init__(self):
@@ -75,13 +87,13 @@ class LabDaoimplementation(AbstractLabDao):
             for row in rows:
                 products.append(
                     LabTech(
-                        test_id=row[0],
-                        test_name=row[1],
-                        test_category=row[2],
-                        normal_range_min=row[3],
-                        normal_range_max=row[4],
-                        unit_of_measurement=row[5],
-                        test_price=row[6],
+                        test_id=row["test_id"],
+                        test_name=row["test_name"],
+                        test_category=row["test_category"],
+                        normal_range_min=row["normal_range_min"],
+                        normal_range_max=row["normal_range_max"],
+                        unit_of_measurement=row["unit_of_measurement"],
+                        test_price=row["test_price"],
                     )
                 )
         except Exception as e:
@@ -98,13 +110,14 @@ class LabDaoimplementation(AbstractLabDao):
             row = cursor.fetchone()
             if row:
                 product = LabTech(
-                                        test_id=row[0],
-                                        test_name=row[1],
-                                        test_category=row[2],
-                                        normal_range_min=row[3],
-                                        normal_range_max=row[4],
-                                        unit_of_measurement=row[5],
-                                        test_price=row[6])
+                    test_id=row["test_id"],
+                    test_name=row["test_name"],
+                    test_category=row["test_category"],
+                    normal_range_min=row["normal_range_min"],
+                    normal_range_max=row["normal_range_max"],
+                    unit_of_measurement=row["unit_of_measurement"],
+                    test_price=row["test_price"],
+                )
         except Exception as e:
             print("Error finding product:",e)
         finally:
@@ -133,6 +146,11 @@ class LabDaoimplementation(AbstractLabDao):
     def delete_test(self, test_id: str) -> bool:
         try:
             cursor = self.conn.cursor()
+            # Ensure connection is alive to avoid hanging on network glitches
+            try:
+                self.conn.ping(reconnect=True)
+            except Exception:
+                pass
             cursor.execute(self.DISABLE, (test_id,))
             self.conn.commit()
             return cursor.rowcount == 1
@@ -143,23 +161,25 @@ class LabDaoimplementation(AbstractLabDao):
             cursor.close()
 
     def view_prescription_results(self):
+        cursor = None
         try:
-            cursor = self.conn.cursor(dictionary=True)   # DictCursor if using MySQL
+            cursor = self.conn.cursor(DictCursor)
             cursor.execute(self.VIEW_PRESCRIPTION_RESULTS)
             rows = cursor.fetchall()
-            return rows
+            return rows or []
         except Exception as e:
             print("Error fetching prescription results:", e)
             return []
         finally:
-            cursor.close()
+            if cursor:
+                cursor.close()
 
     def add_test_result(self, test_prescription_id: int, test_value: str, 
-                        result_status: str, tested_date: str, lab_resultcol: str) -> bool:
+                        result_status: str, tested_date: str, lab_resultcol: str | None = None) -> bool:
         try:
             cursor = self.conn.cursor()
             cursor.execute(self.ADD_TEST_RESULT, (
-                test_prescription_id, test_value, result_status, tested_date, lab_resultcol
+                test_prescription_id, test_value, result_status, tested_date
             ))
             self.conn.commit()
             return cursor.rowcount == 1
@@ -168,3 +188,16 @@ class LabDaoimplementation(AbstractLabDao):
             return False
         finally:
             cursor.close()
+
+    def list_all_test_results(self):
+        cursor = None
+        try:
+            cursor = self.conn.cursor(DictCursor)
+            cursor.execute(self.LIST_ALL_RESULTS)
+            return cursor.fetchall() or []
+        except Exception as e:
+            print("Error listing test results:", e)
+            return []
+        finally:
+            if cursor:
+                cursor.close()
